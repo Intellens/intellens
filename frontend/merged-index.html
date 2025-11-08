@@ -6,159 +6,419 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Poppins", sans-serif; }
-    body { background: radial-gradient(circle at 25% 25%, #f0f3f9, #dfe6ee); min-height: 100vh; }
+    :root{
+      --green:#2F7D32;
+      --green-500:#2F7D32;
+      --green-400:#3F8F43;
+      --green-300:#5AA95D;
+      --green-200:#A2D4A2;
+      --yellow:#E6C229;
+      --bg:#EEF5EF;
+      --ink:#122012;
+      --muted:#5f6b5f;
+      --card:#ffffff;
+      --ring:#cfe8cf;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body {
+      margin: 0;
+      font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--ink);
+      min-height: 100vh;
+      background: radial-gradient(at 20% 20%, #d8f3dc 0px, transparent 50%),
+                  radial-gradient(at 80% 0%, #b7e4c7 0px, transparent 50%),
+                  radial-gradient(at 0% 50%, #95d5b2 0px, transparent 50%),
+                  radial-gradient(at 80% 50%, #74c69d 0px, transparent 50%),
+                  radial-gradient(at 0% 100%, #52b788 0px, transparent 50%);
+      background-color: #e9f7ec;
+      background-attachment: fixed;
+      animation: gradientShift 20s ease infinite;
+      background-size: 200% 200%;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    button{font-family:inherit}
 
-    /* ---------- START SCREEN ---------- */
-    #start-screen {
-      height: 100vh; display: grid; place-items: center; text-align: center; padding: 24px;
+    /* ========== GENERIC ========== */
+    .container{max-width:1100px;margin:0 auto;padding:28px 18px}
+    .card{
+      background:var(--card);
+      border:1px solid #e8efe8;
+      border-radius:18px;
+      box-shadow:0 10px 20px rgba(18,32,18,.04);
     }
-    .start-card {
-      width: min(560px, 92vw);
-      background: #fff; border-radius: 20px; padding: 36px 28px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.08);
+    .btn{
+      appearance:none;border:none;border-radius:12px;padding:12px 18px;
+      background:var(--green-500);color:#fff;font-weight:700;cursor:pointer;
+      box-shadow:0 10px 14px rgba(47,125,50,.18);
+      transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;
     }
-    .start-title { font-size: clamp(28px, 4.5vw, 42px); font-weight: 800; color: #1f2a44; }
-    .start-sub { color: #5a6a85; margin: 8px 0 22px; }
-    .start-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      background: #232f3e; color: #fff; border: none; padding: 12px 18px; border-radius: 12px;
-      font-weight: 700; cursor: pointer; transition: transform .12s ease, filter .12s ease;
-    }
-    .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-    .note { font-size: 12px; color: #7a8aa1; margin-top: 10px; }
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.05);}
+    .btn:active{transform:translateY(0)}
+    .muted{color:var(--muted)}
 
-    /* ---------- LOADER ---------- */
-    #loading {
-      display: none; height: 100vh; place-items: center; text-align: center;
-    }
-    .lego-loader { display: inline-flex; gap: 10px; align-items: end; }
-    .stud { width: 18px; height: 18px; border-radius: 6px; animation: hop 1.2s infinite ease-in-out; }
-    .stud:nth-child(1){ background:#4ECDC4; animation-delay:.0s }
-    .stud:nth-child(2){ background:#FF6B35; animation-delay:.15s }
-    .stud:nth-child(3){ background:#FFD166; animation-delay:.30s }
-    .stud:nth-child(4){ background:#5ac27c; animation-delay:.45s }
-    @keyframes hop { 0%,100%{transform: translateY(0)} 50%{ transform: translateY(-10px)} }
+    /* ========== SCREEN SWITCH ========== */
+    #start-screen,#loader,#dashboard{display:none}
+    #start-screen.active,#loader.active,#dashboard.active{display:block}
 
-    /* ---------- DASHBOARD LAYOUT ---------- */
-    #dashboard { display: none; height: 100vh; position: relative; }
-    .sidebar {
-      position: absolute; inset: 0 auto 0 0; width: 260px;
-      background: linear-gradient(180deg,#232f3e,#39465a); color:#fff;
-      box-shadow: 4px 0 12px rgba(0,0,0,.12);
-      padding: 26px 16px; overflow: auto;
+    /* ========== START SCREEN ========== */
+    .start-wrap{display:grid;place-items:center;min-height:100vh}
+    .start-card{width:min(860px,92vw)}
+    .start-hero{display:grid;place-items:center;padding-top:14px;}
+    .start-icon{
+      width:84px;height:84px;border-radius:18px;
+      background:var(--green-500);
+      color:#fff;display:grid;place-items:center;
+      box-shadow:0 16px 30px rgba(47,125,50,.22);
     }
-    .brand { font-weight: 800; letter-spacing: .5px; margin-bottom: 14px; }
-    .menu {
-      display: grid; gap: 14px;
-    }
-    .menu-block {
-      width: 100%; height: 90px; border-radius: 16px; border: none; cursor: pointer;
-      background: #2a3a4f; color:#d0e0d0; font-weight: 800; text-transform: uppercase; letter-spacing: .6px;
-      box-shadow: 0 10px 18px rgba(0,0,0,.25), inset 0 -6px 10px rgba(0,0,0,.25), inset 0 6px 10px rgba(255,255,255,.12);
-      transition: transform .12s ease, filter .12s ease;
-    }
-    .menu-block:hover { transform: translateY(-2px); filter: saturate(1.06) brightness(1.04); }
-    .menu-block:active { transform: translateY(0); }
+    .start-title{font-size: clamp(28px, 5vw, 48px); text-align:center;font-weight:800;margin:18px 0 6px;}
+    .start-sub{ text-align:center; color:var(--muted); margin-bottom:18px }
 
-    .stage {
-      position: absolute; left: 260px; right: 0; top: 0; bottom: 0;
-      display: grid; place-items: center; padding: 40px;
-      background: repeating-linear-gradient(45deg,#f8fafc 0,#f8fafc 22px,#f1f5f9 22px,#f1f5f9 44px);
+    /* Drag & Drop */
+    .dropzone{
+      margin:14px 18px 20px;border:2px dashed var(--ring);border-radius:16px;
+      padding:30px;display:grid;place-items:center;gap:8px;
+      transition:border-color .15s ease, background .15s ease;
+      background:#f4faf4;
     }
-    .stage-inner {
-      width: min(520px, 70vw); aspect-ratio: 4 / 3; background: #ffffff;
-      border-radius: 24px; box-shadow: inset 0 0 22px rgba(0,0,0,.06), 0 18px 36px rgba(0,0,0,.08);
-      display: grid; place-items: center; position: relative; overflow: hidden;
-    }
-    .build-img { max-width: 86%; max-height: 86%; opacity: 0; transform: scale(.92); transition: opacity .35s, transform .35s; }
-    .build-img.show { opacity: 1; transform: scale(1); }
-    .snap {
-      position:absolute; inset:auto 18px 18px auto; background:#232f3e; color:#fff; border:none; border-radius:12px;
-      padding:10px 14px; font-weight:700; letter-spacing:.4px; cursor:pointer;
-      box-shadow:0 6px 14px rgba(0,0,0,.18);
-    }
+    .dropzone.dragover{background:#eef8ee;border-color:var(--green-300)}
+    .drop-icon{font-size:34px;opacity:.8}
+    .drop-title{font-weight:700}
+    .drop-sub{font-size:13px;color:var(--muted)}
 
-    /* whoosh finale */
-    .whoosh { animation: whoosh .6s ease forwards; }
-    @keyframes whoosh {
-      0% { transform: scale(.9) rotate(-2deg); filter: blur(0px); }
-      60% { transform: scale(1.15) rotate(1deg); filter: blur(2px); }
-      100% { transform: scale(1) rotate(0deg); filter: blur(0px); }
+    .start-actions{display:flex;gap:12px;justify-content:center;margin:6px 0 8px}
+    .learn{display:block;text-align:center;margin:6px 0 22px;color:var(--green-500);font-weight:700;text-decoration:none}
+
+    /* ========== LOADER SCREEN ========== */
+    .loader-wrap{display:grid;place-items:center;min-height:100vh}
+    .loader-card{width:min(780px,92vw);padding:32px}
+    .dot-row{display:flex;gap:10px;justify-content:center;margin-bottom:18px}
+    .dot{width:16px;height:16px;border-radius:50%;background:var(--green-300);animation:bob 1.2s ease-in-out infinite;}
+    .dot:nth-child(2){background:#E6C229;animation-delay:.15s}
+    .dot:nth-child(3){background:var(--green-500);animation-delay:.30s}
+    .dot:nth-child(4){background:#E6C229;animation-delay:.45s}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .loader-title{text-align:center;font-size:clamp(24px,4.5vw,36px);font-weight:800;margin:0 0 4px}
+    .loader-sub{text-align:center;color:var(--muted);margin-bottom:16px}
+    .loader-steps{display:grid;gap:12px;margin-top:8px}
+    .step{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e6eee6;padding:12px;border-radius:12px}
+    .step .dot-mini{width:8px;height:8px;border-radius:50%;background:var(--green-400)}
+
+    /* ========== DASHBOARD ========== */
+/* ========== DASHBOARD ========== */
+/* ========== DASHBOARD (one-page, balanced design) ========== */
+/* ========== DASHBOARD (Enhanced Polished Design) ========== */
+#dashboard {
+  height: 100vh;
+  background: radial-gradient(circle at 25% 25%, #f4f9f4 0%, #eaf3ea 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dash-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  height: 90vh;
+  width: 94vw;
+  border-radius: 28px;
+  background: #ffffffc7;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+/* Sidebar */
+.sidebar {
+  background: linear-gradient(180deg, #f5faf5 0%, #e6f3e7 100%);
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #d9e6d9;
+  box-shadow: inset -2px 0 8px rgba(0, 0, 0, 0.03);
+}
+
+.sidebar-title {
+  font-weight: 900;
+  font-size: 1.6rem;
+  color: var(--green-500);
+  margin-bottom: 18px;
+  text-shadow: 0 1px 0 #ffffff;
+}
+
+.sidebar-sub {
+  display: none;
+}
+
+/* LEGO Buttons */
+.lego-menu {
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  gap: 14px;
+  justify-items: center;
+  width: 100%;
+}
+
+.lego-button {
+  background: transparent;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 10px;
+}
+.lego-button:hover {
+  background: #f0f8f0;
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(47, 125, 50, 0.08);
+}
+
+.lego-img {
+  width: 125px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.1));
+  transition: transform 0.15s ease, filter 0.15s ease;
+  pointer-events: none;
+}
+
+.lego-button:hover .lego-img {
+  transform: translateY(-3px) scale(1.07);
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+}
+
+.lego-title {
+  font-weight: 800;
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+.lego-sub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* Stage Area */
+.stage {
+  background: #f8fcf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.stage-inner {
+  width: min(600px, 70vw);
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(180deg, #ffffff 0%, #f4faf4 100%);
+  border-radius: 26px;
+  border: 1px solid #dce6dc;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06),
+              inset 0 0 12px rgba(255, 255, 255, 0.4);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  animation: breathe 6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06); }
+  50% { transform: scale(1.015); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08); }
+}
+
+.build-img {
+  max-width: 88%;
+  max-height: 88%;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.4s, transform 0.4s;
+}
+.build-img.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.snap {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  background: var(--green-500);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+  display: none;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.snap:hover {
+  transform: scale(1.05);
+  background: var(--green-400);
+}
+
+    .stage{background:#F1F6F1;display:grid;place-items:center;padding:34px}
+    .stage-inner{
+      width:min(680px,78vw);aspect-ratio:4/3;background:#ffffff;border:1px solid #e6eee6;border-radius:22px;
+      box-shadow:inset 0 0 22px rgba(0,0,0,.05),0 18px 36px rgba(0,0,0,.06);
+      display:grid;place-items:center;position:relative;overflow:hidden;
     }
-    .pulse { animation: pulse 1.2s ease 2; }
-    @keyframes pulse { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.05)} }
+    .stage-empty{text-align:center;padding:20px}
+    .stage-empty h2{margin:8px 0 0;font-size:clamp(22px,4vw,30px)}
+    .stage-empty p{color:var(--muted);margin:4px 0 0}
+    .build-img{max-width:86%;max-height:86%;opacity:0;transform:scale(.92);transition:opacity .35s, transform .35s}
+    .build-img.show{opacity:1;transform:scale(1)}
+    .snap{position:absolute;inset:auto 18px 18px auto;background:var(--green-500);color:#fff;border:none;border-radius:12px;
+      padding:10px 14px;font-weight:700;letter-spacing:.4px;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.18);display:none}
+    .whoosh{animation:whoosh .6s ease forwards}
+    @keyframes whoosh{0%{transform:scale(.9) rotate(-2deg)}60%{transform:scale(1.15) rotate(1deg)}100%{transform:scale(1) rotate(0)}}
+    .pulse{animation:pulse 1.2s ease 2}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 
-    /* ---------- SECTIONS (overlays) ---------- */
-    .section {
-      position: fixed; inset: 24px 24px 24px 284px; background: #fff; border-radius: 20px;
-      box-shadow: 0 0 40px rgba(0,0,0,.26); transform: scale(.94); opacity: 0; pointer-events: none;
-      transition: all .28s ease; padding: 26px; overflow: auto; z-index: 5;
+    /* OVERLAYS */
+    .section{position:fixed;inset:24px 24px 24px 304px;background:#fff;border-radius:20px;
+      box-shadow:0 20px 50px rgba(0,0,0,.14);transform:scale(.94);opacity:0;pointer-events:none;
+      transition:all .28s ease;padding:26px;overflow:auto;z-index:5}
+    .section.active{transform:scale(1);opacity:1;pointer-events:auto}
+    .close{position:absolute;top:14px;right:18px;font-size:26px;color:#D84315;cursor:pointer}
+    .section h2{margin-bottom:14px;font-size:clamp(24px,4vw,32px)}
+    .section h3{margin-top:16px;margin-bottom:8px;color:#2F7D32}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .item{background:#f8f9fa;padding:12px;border-radius:8px;border:1px solid #e9ecef;transition:all .2s ease}
+    .item:hover{border-color:#cfe8cf;background:#f4faf4}
+    .file-item{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:12px;margin:8px 0;transition:all .2s ease}
+    .file-item:hover{border-color:#cfe8cf;background:#f4faf4}
+    .file-name{font-weight:700;color:#495057;margin-bottom:6px;font-family:monospace;font-size:13px}
+    .file-tags{display:flex;flex-wrap:wrap;gap:6px}
+    .tag{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+    .tag.language{background:#e3f2fd;color:#1976d2;border:1px solid #bbdefb}
+    .tag.service{background:#f3e5f5;color:#7b1fa2;border:1px solid #e1bee7}
+
+    @media (max-width:860px){
+      .dash-layout{grid-template-columns:1fr}
+      .section{inset:14px}
     }
-    .section.active { transform: scale(1); opacity: 1; pointer-events: auto; }
-    .close { position: absolute; top: 14px; right: 18px; font-size: 26px; color: #ff6b35; cursor: pointer; }
-    .section h2 { margin-bottom: 10px; }
-
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .item { background: #f8f9fa; padding: 10px; border-radius: 6px; }
-
-    .file-item { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 6px; padding: 12px; margin: 8px 0; }
-    .file-name { font-weight: 700; color: #495057; margin-bottom: 6px; font-family: monospace; font-size: 13px; }
-    .file-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag { padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-    .tag.language { background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb; }
-    .tag.service  { background: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
   </style>
 </head>
-<body>
 
-  <!-- START -->
-  <section id="start-screen">
-    <div class="start-card">
-      <div class="start-title">Start Building…</div>
-      <div class="start-sub">Upload a <strong>.zip</strong> of your project and we’ll analyze it into LEGO-style blocks.</div>
-      <div class="start-actions">
-        <button class="btn" id="startBtn">Choose ZIP</button>
-        <input type="file" id="fileInput" accept=".zip" hidden />
+  <!-- ============== START ============== -->
+  <section id="start-screen" class="active">
+    <div class="start-wrap">
+      <div class="start-card card">
+        <div class="start-hero">
+          <div class="start-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+          </div>
+        </div>
+        <h1 class="start-title">Intellens</h1>
+        <p class="start-sub">Upload your project ZIP file to analyze architecture, Terraform, and more.</p>
+
+        <div id="dropzone" class="dropzone">
+          <div class="drop-icon">⬆️</div>
+          <div class="drop-title">Drag & drop your ZIP file here</div>
+          <div class="drop-sub">or click to browse</div>
+          <input type="file" id="fileInput" accept=".zip" hidden />
+        </div>
+
+        <div class="start-actions">
+          <button class="btn" id="chooseBtn">Choose File</button>
+        </div>
+        <a class="learn" href="#" onclick="alert('This is a local prototype that sends your ZIP to http://localhost:8000/upload');return false;">Learn more about this project →</a>
       </div>
-      <div class="note">Your ZIP is processed locally by your running FastAPI at <code>http://localhost:8000</code>.</div>
+      <p class="muted" style="text-align:center;margin-top:12px">Processed locally by your FastAPI at <code>http://localhost:8000</code>.</p>
     </div>
   </section>
 
-  <!-- LOADING -->
-  <section id="loading">
-    <div>
-      <h2 style="margin-bottom: 10px; color:#1f2a44;">Analyzing your project…</h2>
-      <div class="lego-loader" style="margin: 14px 0 6px;">
-        <div class="stud"></div><div class="stud"></div><div class="stud"></div><div class="stud"></div>
+  <!-- ============== LOADER ============== -->
+  <section id="loader">
+    <div class="loader-wrap">
+      <div class="loader-card card">
+        <div class="dot-row"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="loader-title">Analyzing your project…</div>
+        <div class="loader-sub">Building your LEGO structure</div>
+        <div class="loader-steps">
+          <div class="step"><span class="dot-mini"></span> Extracting files</div>
+          <div class="step"><span class="dot-mini"></span> Analyzing architecture</div>
+          <div class="step"><span class="dot-mini"></span> Processing Terraform</div>
+          <div class="step"><span class="dot-mini"></span> Generating insights</div>
+        </div>
       </div>
-      <div class="note">This may take a moment depending on project size.</div>
     </div>
   </section>
 
-  <!-- DASHBOARD -->
+  <!-- ============== DASHBOARD ============== -->
   <section id="dashboard">
-    <aside class="sidebar">
-      <div class="brand">🧱 Dashboard</div>
-      <div class="menu">
-        <button class="menu-block" data-section="project-summary">Summary</button>
-        <button class="menu-block" data-section="system-arch">Architecture</button>
-        <button class="menu-block" data-section="terraform">Terraform</button>
-        <button class="menu-block" data-section="components">Components</button>
-        <button class="menu-block" data-section="frontend">Frontend</button>
-        <button class="menu-block" data-section="readme">README</button>
-      </div>
-    </aside>
+    <div class="dash-layout">
+      <aside class="sidebar">
+        <div class="sidebar-title">Select Blocks</div>
+        <div class="sidebar-sub">Click a LEGO block to add it to the build.</div>
+        <div class="lego-menu">
+          <button class="lego-button menu-block" data-section="project-summary" aria-label="Open Summary">
+            <img class="lego-img" src="images/2-removebg-preview.png" alt="LEGO brick for Summary">
+            <div class="lego-title">Summary</div>
+          </button>
 
-    <div class="stage">
-      <div class="stage-inner" id="stageBox" title="Click the turtle to open everything">
-        <img id="buildImg" class="build-img" alt="build stage" />
-        <button class="snap" id="turtleOpenAll" style="display:none;">Open All</button>
+          <button class="lego-button menu-block" data-section="system-arch" aria-label="Open Architecture">
+            <img class="lego-img" src="images/1-removebg-preview.png" alt="LEGO brick for Architecture">
+            <div class="lego-title">Architecture</div>
+          </button>
+
+          <button class="lego-button menu-block" data-section="terraform" aria-label="Open Terraform">
+            <img class="lego-img" src="images/3-removebg-preview.png" alt="LEGO brick for Terraform">
+            <div class="lego-title">Terraform</div>
+          </button>
+
+          <button class="lego-button menu-block" data-section="components" aria-label="Open Components">
+            <img class="lego-img" src="images/1-removebg-preview.png" alt="LEGO brick for Components">
+            <div class="lego-title">Components</div>
+          </button>
+
+          <button class="lego-button menu-block" data-section="frontend" aria-label="Open Frontend">
+            <img class="lego-img" src="images/2-removebg-preview.png" alt="LEGO brick for Frontend">
+            <div class="lego-title">Frontend</div>
+          </button>
+
+          <button class="lego-button menu-block" data-section="readme" aria-label="Open README">
+            <img class="lego-img" src="images/3-removebg-preview.png" alt="LEGO brick for README">
+            <div class="lego-title">README</div>
+          </button>
+        </div>
+      </aside>
+
+      <div class="stage">
+        <div class="stage-inner" id="stageBox" title="Click to open all sections">
+          <div class="stage-empty" id="stageEmpty">
+            <div style="font-size:40px">🧱</div>
+            <h2>Start Building!</h2>
+            <p>Click on the LEGO blocks in the sidebar to add them to your structure. Collect all blocks to complete the build!</p>
+          </div>
+          <img id="buildImg" class="build-img" alt="build stage" />
+          <button class="snap" id="turtleOpenAll">Open All</button>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- OVERLAYS -->
+  <!-- ============== OVERLAYS ============== -->
   <section id="project-summary" class="section">
     <div class="close" data-close>✖</div>
     <h2>Project Summary</h2>
@@ -202,19 +462,18 @@
   <section id="readme" class="section">
     <div class="close" data-close>✖</div>
     <h2>Generated README</h2>
-    <button class="btn" onclick="copyReadme()">Copy</button>
-    <button class="btn" onclick="downloadReadme()">Download</button>
+    <div style="display:flex;gap:12px;margin-bottom:16px">
+      <button class="btn" onclick="copyReadme()">Copy</button>
+      <button class="btn" onclick="downloadReadme()">Download</button>
+    </div>
     <pre id="readme-content" style="background:#f8f9fa;border-radius:10px;padding:14px;white-space:pre-wrap;font-family:monospace;font-size:13px;margin-top:12px;"></pre>
   </section>
 
-  <!-- (optional) your existing helpers -->
   <script src="aws-tech-diagram.js"></script>
   <script src="enhanced-aws-tech-diagram.js"></script>
   <script src="aws-infrastructure-designer.js"></script>
 
   <script>
-    // ------ image frames (build progression) ------
-    // using your supplied assets; order = from a single block to final turtle
     const BUILD_FRAMES = [
       "images/9-removebg-preview.png",
       "images/8-removebg-preview.png",
@@ -223,61 +482,59 @@
       "images/5-removebg-preview.png",
       "images/4-removebg-preview.png"
     ];
-    const FINAL_TURTLE = "images/Final_Turtle.png"; // last frame doubles as turtle hero
+    const FINAL_TURTLE = "images/Final_Turtle.png";
     (() => { const _img = new Image(); _img.src = FINAL_TURTLE; })();
 
-    // ------ state ------
     let analysisData = {};
-    let stageIndex = -1;                // which build frame is currently shown
-    let clickedSet = new Set();         // which sidebar blocks were clicked
-    const orderedSections = [           // the 6 steps that build the turtle
-      "project-summary","system-arch","terraform","components","frontend","readme"
-    ];
+    let stageIndex = -1;
+    let clickedSet = new Set();
+    const orderedSections = ["project-summary","system-arch","terraform","components","frontend","readme"];
+    BUILD_FRAMES.forEach(src=>{const i=new Image(); i.src=src;});
 
-    // preload images for smoother animation
-    BUILD_FRAMES.forEach(src => { const i = new Image(); i.src = src; });
-
-    // ------ elements ------
     const startScreen = document.getElementById("start-screen");
-    const loading = document.getElementById("loading");
+    const loader = document.getElementById("loader");
     const dashboard = document.getElementById("dashboard");
+    const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
-    const startBtn = document.getElementById("startBtn");
+    const chooseBtn = document.getElementById("chooseBtn");
     const buildImg = document.getElementById("buildImg");
     const stageBox = document.getElementById("stageBox");
+    const stageEmpty = document.getElementById("stageEmpty");
     const turtleOpenAll = document.getElementById("turtleOpenAll");
 
+    chooseBtn.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("dragover", (e)=>{e.preventDefault(); dropzone.classList.add("dragover")});
+    dropzone.addEventListener("dragleave", ()=>dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", (e)=>{
+      e.preventDefault(); dropzone.classList.remove("dragover");
+      const file = e.dataTransfer.files?.[0]; if(file){ handleUpload(file); }
+    });
+    fileInput.addEventListener("change", () => {
+      const f = fileInput.files[0]; if(!f) return; handleUpload(f);
+    });
 
-    startBtn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", uploadFile);
-
-    // ------ upload / analyze ------
-    async function uploadFile(){
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      // flip screens
-      startScreen.style.display = "none";
-      loading.style.display = "grid";
+    async function handleUpload(file){
+      startScreen.classList.remove("active");
+      loader.classList.add("active");
 
       const formData = new FormData();
       formData.append("file", file);
 
-      try {
+      try{
         const res = await fetch("http://localhost:8000/upload", { method: "POST", body: formData });
         const data = await res.json();
         analysisData = data;
-      } catch (e) {
-        alert("Upload failed: " + e.message);
-      } finally {
-        // go to dashboard either way so UI works even with stub data
-        loading.style.display = "none";
-        dashboard.style.display = "block";
+      }catch(e){
+        alert("Upload failed: " + e.message + ". We'll continue with an empty UI so you can test the flow.");
+        analysisData = {};
+      }finally{
+        loader.classList.remove("active");
+        dashboard.classList.add("active");
         initDashboard();
       }
     }
 
-    // ------ dashboard / sidebar clicks -> build + open section ------
     function initDashboard(){
       document.querySelectorAll(".menu-block").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -287,46 +544,53 @@
         });
       });
 
-      // clicking the turtle opens all sections at once (nice easter egg)
       turtleOpenAll.addEventListener("click", () => {
         document.querySelectorAll(".section").forEach(s => s.classList.add("active"));
       });
-
-      // also clicking the stage (final) triggers same
       stageBox.addEventListener("click", () => {
-        if (stageIndex >= BUILD_FRAMES.length - 1) {
-          turtleOpenAll.click();
-        }
+        if (stageIndex >= BUILD_FRAMES.length - 1) turtleOpenAll.click();
       });
 
-      // if your backend returned data already, render it into panels
       displayResults(analysisData || {});
     }
 
     function addNextBlock(section){
-      if (clickedSet.has(section)) return; // one block per section
+      if (clickedSet.has(section)) { openSection(section); return; }
       clickedSet.add(section);
 
-      // only increment if the section is in the ordered list (we ignore extras)
+      stageEmpty.style.display = "none";
+
       const pos = orderedSections.indexOf(section);
       if (pos === -1) return;
 
-      // which frame should we be on now? (# of unique clicks capped to frames)
       const targetIndex = Math.min(clickedSet.size - 1, BUILD_FRAMES.length - 1);
-
       if (targetIndex !== stageIndex){
         stageIndex = targetIndex;
         buildImg.classList.remove("show");
-        // small delay lets the CSS transition play
-        setTimeout(() => {
-          buildImg.src = BUILD_FRAMES[stageIndex];
-          buildImg.onload = () => buildImg.classList.add("show");
-          // final whoosh once last piece placed
-          if (stageIndex === BUILD_FRAMES.length - 1) {
+    
+        const isFinal = (clickedSet.size === orderedSections.length);
+        const nextSrc = isFinal ? "images/Final_Turtle.png" : BUILD_FRAMES[stageIndex];
+    
+        buildImg.onerror = () => {
+          console.error("Image failed to load:", nextSrc);
+          alert("Couldn't load image: " + nextSrc + "\n(Check file name/case and folder path)");
+        };
+    
+        buildImg.onload = () => {
+          buildImg.classList.add("show");
+    
+          if (isFinal) {
             stageBox.classList.add("whoosh");
-            setTimeout(() => { stageBox.classList.remove("whoosh"); stageBox.classList.add("pulse"); }, 620);
+            setTimeout(() => {
+              stageBox.classList.remove("whoosh");
+              stageBox.classList.add("pulse");
+            }, 620);
             turtleOpenAll.style.display = "inline-block";
           }
+        };
+    
+        setTimeout(() => {
+          buildImg.src = nextSrc;
         }, 60);
       }
     }
@@ -335,7 +599,6 @@
       closeSections();
       document.getElementById(id)?.classList.add("active");
 
-      // render AWS cards gracefully if diagram renderer throws
       if (id === "terraform" && analysisData?.aws_infrastructure_diagram) {
         const target = document.getElementById("terraform-diagram");
         target.innerHTML = "";
@@ -355,21 +618,14 @@
         }
       }
     }
-
-    function closeSections(){
-      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-    }
-    // close buttons
+    function closeSections(){ document.querySelectorAll(".section").forEach(s => s.classList.remove("active")); }
     document.querySelectorAll("[data-close]").forEach(x => x.addEventListener("click", closeSections));
 
-    // ------ fill panels with backend results (kept from your original) ------
     function displayResults(data){
-      // Languages
       const langs = data.languages || {};
       document.getElementById('languages').innerHTML = Object.entries(langs)
         .map(([lang,count]) => `<div class="item">${lang}: ${count} file(s)</div>`).join('') || '<div class="item">None</div>';
 
-      // Services + (optional) AWS recs
       let allServices = {...(data.services || {})};
       const awsTypes = data?.aws_infrastructure_diagram?.summary?.service_types || [];
       awsTypes.forEach(s => { if (!allServices[s]) allServices[s+" (Recommended)"] = 1; });
@@ -377,7 +633,6 @@
         ? Object.entries(allServices).map(([s,c])=>`<div class="item">${s}: ${c} ref(s)</div>`).join('')
         : '<div class="item">No services detected</div>';
 
-      // File details
       const files = data.file_details || [];
       document.getElementById('file-details').innerHTML = files.map(f => {
         const ltags = (f.languages||[]).map(x=>`<span class="tag language">${x}</span>`).join('');
@@ -385,7 +640,6 @@
         return `<div class="file-item"><div class="file-name">${f.file}</div><div class="file-tags">${ltags}${stags}</div></div>`;
       }).join('');
 
-      // Architecture
       if (data.workflow_diagram?.architecture?.components){
         const arch = data.workflow_diagram.architecture;
         const users = arch.components.filter(c=>c.type==='user');
@@ -396,8 +650,7 @@
             ${c.logo ? `<img src="${c.logo}" alt="${c.title}" style="width:40px;height:40px;object-fit:contain">` : ''}
             <div style="font-weight:700;margin-top:8px">${c.title||''}</div>
             <div style="font-size:12px;color:#64748b">${c.description||''}</div>
-          </div>
-        `;
+          </div>`;
         document.getElementById('workflow-diagram').innerHTML = `
           <div style="text-align:center">
             <h4>Actors</h4>
@@ -413,7 +666,6 @@
           </div>`;
       }
 
-      // Components
       if (data.comprehensive_diagram){
         document.getElementById('nodes').innerHTML =
           '<h4 style="margin:6px 0">Components</h4>' +
@@ -423,16 +675,13 @@
           data.comprehensive_diagram.edges.map(e=>`<div class="item">${e.source} → ${e.target}</div>`).join('');
       }
 
-      // Frontend
       document.getElementById('frontend-preview').innerHTML =
         data.frontend_preview || '<div style="text-align:center;padding:40px;color:#666"><h3>No Frontend Detected</h3><p>This looks like a backend/CLI project.</p></div>';
 
-      // README
       document.getElementById('readme-content').textContent = data.readme_content || 'No README content generated';
       window.currentReadmeFilename = data.readme_filename;
     }
 
-    // ------ utilities ------
     function copyReadme(){
       const content = document.getElementById('readme-content').textContent;
       navigator.clipboard.writeText(content).then(()=>alert("README copied!"));
