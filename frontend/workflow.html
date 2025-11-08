@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workflow Diagram</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .workflow-container { display: flex; flex-direction: column; align-items: center; }
+        .step { 
+            display: inline-block; 
+            margin: 10px; 
+            padding: 15px; 
+            border: 2px solid #007acc; 
+            border-radius: 10px; 
+            background: #f0f8ff; 
+            text-align: center; 
+            min-width: 120px;
+        }
+        .step-number { 
+            background: #007acc; 
+            color: white; 
+            border-radius: 50%; 
+            width: 25px; 
+            height: 25px; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 10px;
+        }
+        .step-icon { font-size: 24px; margin: 5px 0; }
+        .step-title { font-weight: bold; margin: 5px 0; }
+        .step-desc { font-size: 12px; color: #666; }
+        .flow-arrow { font-size: 24px; color: #007acc; margin: 0 10px; }
+        .workflow-row { display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+        .tech-section { margin-top: 40px; }
+        .tech-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .tech-item { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            background: #f9f9f9; 
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="workflow-container">
+        <h1>Project Architecture Workflow</h1>
+        <div id="workflow-content">
+            <!-- Workflow will be rendered here -->
+        </div>
+    </div>
+
+    <script>
+        function renderWorkflow(workflowData) {
+            const container = document.getElementById('workflow-content');
+            
+            // Render main workflow steps
+            const stepsHtml = workflowData.workflow.steps.map((step, index) => {
+                const arrow = index < workflowData.workflow.steps.length - 1 ? '<span class="flow-arrow">→</span>' : '';
+                return `
+                    <div class="step">
+                        <div class="step-number">${step.number}</div>
+                        <div class="step-icon">${step.icon}</div>
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-desc">${step.description}</div>
+                    </div>
+                    ${arrow}
+                `;
+            }).join('');
+            
+            // Render technology components
+            const techHtml = workflowData.workflow.components.length > 0 ? `
+                <div class="tech-section">
+                    <h3>Detected Technologies</h3>
+                    <div class="tech-grid">
+                        ${workflowData.workflow.components.map(comp => `
+                            <div class="tech-item">
+                                <div style="font-size: 20px;">${comp.icon}</div>
+                                <div style="font-weight: bold;">${comp.title}</div>
+                                <div style="font-size: 12px; color: #666;">${comp.description}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+            
+            container.innerHTML = `
+                <div class="workflow-row">${stepsHtml}</div>
+                ${techHtml}
+                <div style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+                    <strong>Project Complexity:</strong> ${workflowData.metadata.project_complexity}<br>
+                    <strong>Languages:</strong> ${workflowData.metadata.languages_detected}<br>
+                    <strong>Services:</strong> ${workflowData.metadata.services_detected}
+                </div>
+            `;
+        }
+
+        // Example usage - replace with actual API call
+        const exampleData = {
+            workflow: {
+                title: "Sample Project Architecture Workflow",
+                steps: [
+                    { number: 1, title: "Developer", description: "Uploads project files", icon: "👤" },
+                    { number: 2, title: "File Processing", description: "Analyzes files", icon: "📁" },
+                    { number: 3, title: "Service Detection", description: "Identifies services", icon: "🔍" },
+                    { number: 4, title: "Diagram Generation", description: "Creates diagram", icon: "📊" },
+                    { number: 5, title: "User Interface", description: "Displays results", icon: "💻" }
+                ],
+                components: [
+                    { title: "Python", description: "5 files", icon: "⚡" },
+                    { title: "AWS S3", description: "3 references", icon: "☁️" }
+                ]
+            },
+            metadata: {
+                project_complexity: "Medium",
+                languages_detected: 2,
+                services_detected: 3
+            }
+        };
+        
+        renderWorkflow(exampleData);
+    </script>
+</body>
+</html>

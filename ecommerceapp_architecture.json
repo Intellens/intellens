@@ -1,0 +1,522 @@
+{
+  "diagram": {
+    "title": "ECommerceApp Layered Architecture",
+    "style": "layered_architecture",
+    "project_name": "ECommerceApp",
+    "layers": {
+      "presentation": {
+        "name": "Presentation Layer",
+        "order": 1,
+        "services": [
+          {
+            "id": "cdn",
+            "name": "CloudFront CDN",
+            "icon": "\ud83c\udf10",
+            "layer": "presentation",
+            "category": "cdn",
+            "order": 1
+          }
+        ],
+        "color": "#E3F2FD",
+        "description": "User interface and client applications"
+      },
+      "application": {
+        "name": "Application Layer",
+        "order": 2,
+        "services": [
+          {
+            "id": "lambda",
+            "name": "Lambda Functions",
+            "icon": "\ud83d\udd36",
+            "layer": "application",
+            "category": "serverless",
+            "order": 2
+          },
+          {
+            "id": "auth",
+            "name": "Cognito Auth",
+            "icon": "\ud83d\udd10",
+            "layer": "application",
+            "category": "auth",
+            "order": 2
+          },
+          {
+            "id": "api",
+            "name": "API Gateway",
+            "icon": "\ud83d\udd04",
+            "layer": "application",
+            "category": "api",
+            "order": 2
+          },
+          {
+            "id": "ecs",
+            "name": "ECS Containers",
+            "icon": "\ud83d\udce6",
+            "layer": "application",
+            "category": "container",
+            "order": 2
+          }
+        ],
+        "color": "#F3E5F5",
+        "description": "Business logic and API processing"
+      },
+      "integration": {
+        "name": "Integration Layer",
+        "order": 3,
+        "services": [],
+        "color": "#FFF3E0",
+        "description": "Service orchestration and messaging"
+      },
+      "data": {
+        "name": "Data Layer",
+        "order": 4,
+        "services": [
+          {
+            "id": "s3",
+            "name": "S3 Storage",
+            "icon": "\ud83e\udea3",
+            "layer": "data",
+            "category": "storage",
+            "order": 4
+          },
+          {
+            "id": "dynamodb",
+            "name": "DynamoDB",
+            "icon": "\u26a1",
+            "layer": "data",
+            "category": "nosql_database",
+            "order": 4
+          },
+          {
+            "id": "rds",
+            "name": "RDS Database",
+            "icon": "\ud83d\uddc4\ufe0f",
+            "layer": "data",
+            "category": "sql_database",
+            "order": 4
+          }
+        ],
+        "color": "#E8F5E8",
+        "description": "Data storage and management"
+      },
+      "infrastructure": {
+        "name": "Infrastructure Layer",
+        "order": 5,
+        "services": [
+          {
+            "id": "route53",
+            "name": "Route 53",
+            "icon": "\ud83d\udd04",
+            "layer": "infrastructure",
+            "category": "dns",
+            "order": 5
+          }
+        ],
+        "color": "#FFF8E1",
+        "description": "Compute, network, and security resources"
+      }
+    },
+    "services": [
+      {
+        "id": "s3",
+        "name": "S3 Storage",
+        "icon": "\ud83e\udea3",
+        "layer": "data",
+        "category": "storage",
+        "order": 4
+      },
+      {
+        "id": "dynamodb",
+        "name": "DynamoDB",
+        "icon": "\u26a1",
+        "layer": "data",
+        "category": "nosql_database",
+        "order": 4
+      },
+      {
+        "id": "rds",
+        "name": "RDS Database",
+        "icon": "\ud83d\uddc4\ufe0f",
+        "layer": "data",
+        "category": "sql_database",
+        "order": 4
+      },
+      {
+        "id": "cdn",
+        "name": "CloudFront CDN",
+        "icon": "\ud83c\udf10",
+        "layer": "presentation",
+        "category": "cdn",
+        "order": 1
+      },
+      {
+        "id": "lambda",
+        "name": "Lambda Functions",
+        "icon": "\ud83d\udd36",
+        "layer": "application",
+        "category": "serverless",
+        "order": 2
+      },
+      {
+        "id": "route53",
+        "name": "Route 53",
+        "icon": "\ud83d\udd04",
+        "layer": "infrastructure",
+        "category": "dns",
+        "order": 5
+      },
+      {
+        "id": "auth",
+        "name": "Cognito Auth",
+        "icon": "\ud83d\udd10",
+        "layer": "application",
+        "category": "auth",
+        "order": 2
+      },
+      {
+        "id": "api",
+        "name": "API Gateway",
+        "icon": "\ud83d\udd04",
+        "layer": "application",
+        "category": "api",
+        "order": 2
+      },
+      {
+        "id": "ecs",
+        "name": "ECS Containers",
+        "icon": "\ud83d\udce6",
+        "layer": "application",
+        "category": "container",
+        "order": 2
+      }
+    ],
+    "connections": [
+      {
+        "source": "cdn",
+        "target": "lambda",
+        "source_layer": "presentation",
+        "target_layer": "application",
+        "description": "HTTP/HTTPS requests",
+        "type": "data_flow"
+      },
+      {
+        "source": "cdn",
+        "target": "api",
+        "source_layer": "presentation",
+        "target_layer": "application",
+        "description": "HTTP/HTTPS requests",
+        "type": "data_flow"
+      },
+      {
+        "source": "lambda",
+        "target": "s3",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "read/write"
+      },
+      {
+        "source": "lambda",
+        "target": "dynamodb",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "read/write"
+      },
+      {
+        "source": "lambda",
+        "target": "rds",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "data_flow"
+      },
+      {
+        "source": "api",
+        "target": "s3",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "data_flow"
+      },
+      {
+        "source": "api",
+        "target": "dynamodb",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "query"
+      },
+      {
+        "source": "api",
+        "target": "rds",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "data_flow"
+      },
+      {
+        "source": "ecs",
+        "target": "s3",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "data_flow"
+      },
+      {
+        "source": "ecs",
+        "target": "dynamodb",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "data_flow"
+      },
+      {
+        "source": "ecs",
+        "target": "rds",
+        "source_layer": "application",
+        "target_layer": "data",
+        "description": "Data operations",
+        "type": "connection"
+      }
+    ],
+    "workflow_steps": [
+      {
+        "step": 1,
+        "layer": "presentation",
+        "title": "Presentation Layer",
+        "description": "User interface and client applications",
+        "services": [
+          "CloudFront CDN"
+        ],
+        "processing_details": "Handles user requests, content delivery, and client-side processing using CloudFront CDN"
+      },
+      {
+        "step": 2,
+        "layer": "application",
+        "title": "Application Layer",
+        "description": "Business logic and API processing",
+        "services": [
+          "Lambda Functions",
+          "Cognito Auth",
+          "API Gateway",
+          "ECS Containers"
+        ],
+        "processing_details": "Processes business logic, authentication, and API operations using Lambda Functions, Cognito Auth, API Gateway, ECS Containers"
+      },
+      {
+        "step": 3,
+        "layer": "data",
+        "title": "Data Layer",
+        "description": "Data storage and management",
+        "services": [
+          "S3 Storage",
+          "DynamoDB",
+          "RDS Database"
+        ],
+        "processing_details": "Stores and retrieves data, manages persistence and caching using S3 Storage, DynamoDB, RDS Database"
+      },
+      {
+        "step": 4,
+        "layer": "infrastructure",
+        "title": "Infrastructure Layer",
+        "description": "Compute, network, and security resources",
+        "services": [
+          "Route 53"
+        ],
+        "processing_details": "Provides compute resources, networking, and security foundations using Route 53"
+      }
+    ],
+    "processing_order": [
+      [
+        "presentation",
+        {
+          "name": "Presentation Layer",
+          "order": 1,
+          "services": [
+            {
+              "id": "cdn",
+              "name": "CloudFront CDN",
+              "icon": "\ud83c\udf10",
+              "layer": "presentation",
+              "category": "cdn",
+              "order": 1
+            }
+          ],
+          "color": "#E3F2FD",
+          "description": "User interface and client applications"
+        }
+      ],
+      [
+        "application",
+        {
+          "name": "Application Layer",
+          "order": 2,
+          "services": [
+            {
+              "id": "lambda",
+              "name": "Lambda Functions",
+              "icon": "\ud83d\udd36",
+              "layer": "application",
+              "category": "serverless",
+              "order": 2
+            },
+            {
+              "id": "auth",
+              "name": "Cognito Auth",
+              "icon": "\ud83d\udd10",
+              "layer": "application",
+              "category": "auth",
+              "order": 2
+            },
+            {
+              "id": "api",
+              "name": "API Gateway",
+              "icon": "\ud83d\udd04",
+              "layer": "application",
+              "category": "api",
+              "order": 2
+            },
+            {
+              "id": "ecs",
+              "name": "ECS Containers",
+              "icon": "\ud83d\udce6",
+              "layer": "application",
+              "category": "container",
+              "order": 2
+            }
+          ],
+          "color": "#F3E5F5",
+          "description": "Business logic and API processing"
+        }
+      ],
+      [
+        "integration",
+        {
+          "name": "Integration Layer",
+          "order": 3,
+          "services": [],
+          "color": "#FFF3E0",
+          "description": "Service orchestration and messaging"
+        }
+      ],
+      [
+        "data",
+        {
+          "name": "Data Layer",
+          "order": 4,
+          "services": [
+            {
+              "id": "s3",
+              "name": "S3 Storage",
+              "icon": "\ud83e\udea3",
+              "layer": "data",
+              "category": "storage",
+              "order": 4
+            },
+            {
+              "id": "dynamodb",
+              "name": "DynamoDB",
+              "icon": "\u26a1",
+              "layer": "data",
+              "category": "nosql_database",
+              "order": 4
+            },
+            {
+              "id": "rds",
+              "name": "RDS Database",
+              "icon": "\ud83d\uddc4\ufe0f",
+              "layer": "data",
+              "category": "sql_database",
+              "order": 4
+            }
+          ],
+          "color": "#E8F5E8",
+          "description": "Data storage and management"
+        }
+      ],
+      [
+        "infrastructure",
+        {
+          "name": "Infrastructure Layer",
+          "order": 5,
+          "services": [
+            {
+              "id": "route53",
+              "name": "Route 53",
+              "icon": "\ud83d\udd04",
+              "layer": "infrastructure",
+              "category": "dns",
+              "order": 5
+            }
+          ],
+          "color": "#FFF8E1",
+          "description": "Compute, network, and security resources"
+        }
+      ]
+    ]
+  },
+  "terraform_config": {
+    "terraform": {
+      "required_providers": {
+        "aws": {
+          "source": "hashicorp/aws",
+          "version": "~> 5.0"
+        }
+      }
+    },
+    "provider": {
+      "aws": {
+        "region": "us-east-1"
+      }
+    },
+    "resource": {
+      "aws_s3_bucket": {
+        "main": {
+          "bucket": "ecommerceapp-4981",
+          "tags": {
+            "Name": "ECommerceApp-storage",
+            "Environment": "development"
+          }
+        }
+      },
+      "aws_dynamodb_table": {
+        "main": {
+          "name": "ECommerceApp-table",
+          "billing_mode": "PAY_PER_REQUEST",
+          "hash_key": "id",
+          "attribute": [
+            {
+              "name": "id",
+              "type": "S"
+            }
+          ],
+          "tags": {
+            "Name": "ECommerceApp-dynamodb",
+            "Environment": "development"
+          }
+        }
+      },
+      "aws_lambda_function": {
+        "main": {
+          "filename": "lambda_function.zip",
+          "function_name": "ECommerceApp-lambda",
+          "role": "${aws_iam_role.lambda_role.arn}",
+          "handler": "index.handler",
+          "runtime": "python3.9",
+          "tags": {
+            "Name": "ECommerceApp-lambda",
+            "Environment": "development"
+          }
+        }
+      },
+      "aws_iam_role": {
+        "lambda_role": {
+          "name": "ECommerceApp-lambda-role",
+          "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Action\": \"sts:AssumeRole\", \"Effect\": \"Allow\", \"Principal\": {\"Service\": \"lambda.amazonaws.com\"}}]}"
+        }
+      }
+    }
+  },
+  "terraform_hcl": "terraform {\n  required_providers = {\n    {\n      source = \"hashicorp/aws\"\n      version = \"~> 5.0\"\n    }\n  }\n}\n\nprovider {\n  aws = {\n    region = \"us-east-1\"\n  }\n}\n\nresource \"aws_s3_bucket\" \"main\" {\n  bucket = \"ecommerceapp-4981\"\n  {\n    Name = \"ECommerceApp-storage\"\n    Environment = \"development\"\n  }\n}\n\nresource \"aws_dynamodb_table\" \"main\" {\n  name = \"ECommerceApp-table\"\n  billing_mode = \"PAY_PER_REQUEST\"\n  hash_key = \"id\"\n  attribute = \"[{'name': 'id', 'type': 'S'}]\"\n  {\n    Name = \"ECommerceApp-dynamodb\"\n    Environment = \"development\"\n  }\n}\n\nresource \"aws_lambda_function\" \"main\" {\n  filename = \"lambda_function.zip\"\n  function_name = \"ECommerceApp-lambda\"\n  role = ${aws_iam_role.lambda_role.arn}\n  handler = \"index.handler\"\n  runtime = \"python3.9\"\n  {\n    Name = \"ECommerceApp-lambda\"\n    Environment = \"development\"\n  }\n}\n\nresource \"aws_iam_role\" \"lambda_role\" {\n  name = \"ECommerceApp-lambda-role\"\n  assume_role_policy = \"{\"Version\": \"2012-10-17\", \"Statement\": [{\"Action\": \"sts:AssumeRole\", \"Effect\": \"Allow\", \"Principal\": {\"Service\": \"lambda.amazonaws.com\"}}]}\"\n}"
+}

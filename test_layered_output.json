@@ -1,0 +1,180 @@
+{
+  "terraform_config": {
+    "terraform": {
+      "required_providers": {
+        "aws": {
+          "source": "hashicorp/aws",
+          "version": "~> 5.0"
+        }
+      }
+    },
+    "provider": {
+      "aws": {
+        "region": "us-east-1"
+      }
+    },
+    "resource": {}
+  },
+  "diagram": {
+    "title": "TestWebApp Architecture",
+    "style": "tech_diagram",
+    "project_name": "TestWebApp",
+    "services": [
+      {
+        "id": "storage",
+        "name": "File Storage",
+        "icon": "\ud83e\udea3",
+        "color": "#52C41A",
+        "category": "storage"
+      },
+      {
+        "id": "nosql_db",
+        "name": "NoSQL Database",
+        "icon": "\u26a1",
+        "color": "#4ECDC4",
+        "category": "nosql_database"
+      },
+      {
+        "id": "sql_db",
+        "name": "SQL Database",
+        "icon": "\ud83d\uddc4\ufe0f",
+        "color": "#4ECDC4",
+        "category": "sql_database"
+      },
+      {
+        "id": "cdn",
+        "name": "Content Delivery",
+        "icon": "\ud83c\udf10",
+        "color": "#722ED1",
+        "category": "cdn"
+      },
+      {
+        "id": "serverless",
+        "name": "Serverless Functions",
+        "icon": "\ud83d\udd36",
+        "color": "#FF9500",
+        "category": "serverless"
+      },
+      {
+        "id": "auth",
+        "name": "Authentication",
+        "icon": "\ud83d\udd10",
+        "color": "#FF6B6B",
+        "category": "auth"
+      },
+      {
+        "id": "api",
+        "name": "API Server",
+        "icon": "\ud83d\udd04",
+        "color": "#FF6B9D",
+        "category": "api"
+      },
+      {
+        "id": "cloudformation",
+        "name": "Infrastructure",
+        "icon": "\ud83d\udccb",
+        "color": "#FF6B9D",
+        "category": "management"
+      }
+    ],
+    "connections": [
+      {
+        "source": "cdn",
+        "target": "api",
+        "type": "invoke"
+      },
+      {
+        "source": "cdn",
+        "target": "serverless",
+        "type": "invoke"
+      },
+      {
+        "source": "cdn",
+        "target": "storage",
+        "type": "read/write"
+      },
+      {
+        "source": "serverless",
+        "target": "nosql_db",
+        "type": "query"
+      },
+      {
+        "source": "serverless",
+        "target": "sql_db",
+        "type": "query"
+      },
+      {
+        "source": "serverless",
+        "target": "storage",
+        "type": "read/write"
+      },
+      {
+        "source": "auth",
+        "target": "nosql_db",
+        "type": "query"
+      },
+      {
+        "source": "auth",
+        "target": "sql_db",
+        "type": "query"
+      },
+      {
+        "source": "api",
+        "target": "serverless",
+        "type": "invoke"
+      },
+      {
+        "source": "api",
+        "target": "nosql_db",
+        "type": "query"
+      },
+      {
+        "source": "api",
+        "target": "sql_db",
+        "type": "query"
+      },
+      {
+        "source": "api",
+        "target": "auth",
+        "type": "invoke"
+      }
+    ],
+    "workflow_steps": [
+      {
+        "step": 1,
+        "service": "storage",
+        "description": "File Storage processing"
+      },
+      {
+        "step": 2,
+        "service": "nosql_db",
+        "description": "NoSQL Database processing"
+      },
+      {
+        "step": 3,
+        "service": "sql_db",
+        "description": "SQL Database processing"
+      },
+      {
+        "step": 4,
+        "service": "cdn",
+        "description": "Content Delivery processing"
+      },
+      {
+        "step": 5,
+        "service": "serverless",
+        "description": "Serverless Functions processing"
+      },
+      {
+        "step": 6,
+        "service": "auth",
+        "description": "Authentication processing"
+      },
+      {
+        "step": 7,
+        "service": "api",
+        "description": "API Server processing"
+      }
+    ]
+  }
+}
