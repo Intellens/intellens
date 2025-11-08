@@ -383,6 +383,7 @@ class AWSInfrastructureDesigner {
 
         // Click connections
         this.attachDragDropListeners();
+        this.attachScrollListener();
     }
 
     selectService(service) {
@@ -424,6 +425,40 @@ class AWSInfrastructureDesigner {
         });
     }
 
+    attachScrollListener() {
+        const container = this.container.querySelector('.canvas-content-flex');
+        
+        const updateConnections = () => {
+            // Find all connection elements created by createConnectionFromMouse
+            const connections = container.querySelectorAll('div[style*="position: absolute"][style*="background: #007bff"]');
+            
+            connections.forEach(connection => {
+                // Skip if this connection has stored node references
+                if (!connection.fromNode || !connection.toNode) return;
+                
+                const containerRect = container.getBoundingClientRect();
+                const fromRect = connection.fromNode.getBoundingClientRect();
+                const toRect = connection.toNode.getBoundingClientRect();
+                
+                const startX = fromRect.left - containerRect.left + fromRect.width / 2;
+                const startY = fromRect.top - containerRect.top + fromRect.height / 2;
+                const endX = toRect.left - containerRect.left + toRect.width / 2;
+                const endY = toRect.top - containerRect.top + toRect.height / 2;
+                
+                const length = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
+                const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+                
+                connection.style.left = `${startX}px`;
+                connection.style.top = `${startY}px`;
+                connection.style.width = `${length}px`;
+                connection.style.transform = `rotate(${angle}deg)`;
+            });
+        };
+        
+        container.addEventListener('scroll', updateConnections);
+        window.addEventListener('resize', updateConnections);
+    }
+
     attachDragDropListeners() {
         let selectedOutputNode = null;
         let startMousePos = null;
@@ -456,18 +491,27 @@ class AWSInfrastructureDesigner {
     
     createConnectionFromMouse(startPos, endPos) {
         const content = this.container.querySelector('.canvas-content-flex');
+        const contentRect = content.getBoundingClientRect();
         
-        const startX = startPos.x;
-        const startY = startPos.y;
-        const endX = endPos.x;
-        const endY = endPos.y;
+        // Find the nodes that were clicked
+        const fromNode = document.elementFromPoint(startPos.x, startPos.y).closest('.aws-service');
+        const toNode = document.elementFromPoint(endPos.x, endPos.y).closest('.aws-service');
+        
+        const startX = startPos.x - contentRect.left;
+        const startY = startPos.y - contentRect.top;
+        const endX = endPos.x - contentRect.left;
+        const endY = endPos.y - contentRect.top;
         
         const connection = document.createElement('div');
         const length = Math.sqrt((endX-startX)**2 + (endY-startY)**2);
         const angle = Math.atan2(endY-startY, endX-startX) * 180/Math.PI;
         
+        // Store node references for scroll updates
+        connection.fromNode = fromNode;
+        connection.toNode = toNode;
+        
         connection.style.cssText = `
-            position: fixed;
+            position: absolute;
             left: ${startX}px;
             top: ${startY}px;
             width: ${length}px;
@@ -487,16 +531,17 @@ class AWSInfrastructureDesigner {
         const arrow = document.createElement('div');
         arrow.style.cssText = `
             position: absolute;
-            right: -6px;
-            top: -3px;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
             width: 0;
             height: 0;
             border-left: 6px solid #007bff;
             border-top: 3px solid transparent;
             border-bottom: 3px solid transparent;
         `;
+
         connection.appendChild(arrow);
-        
         content.appendChild(connection);
     }
 }
