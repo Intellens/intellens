@@ -4,35 +4,36 @@ from collections import defaultdict
 
 def detect_language_from_content(content, filename):
     """Detect programming language from file content and patterns."""
-    # Language indicators in content
-    patterns = {
-        'Python': [r'import\s+\w+', r'def\s+\w+', r'class\s+\w+', r'if\s+__name__\s*=='],
-        'JavaScript': [r'function\s+\w+', r'var\s+\w+', r'let\s+\w+', r'const\s+\w+', r'=>'],
-        'TypeScript': [r'interface\s+\w+', r'type\s+\w+', r':\s*\w+\s*=', r'export\s+'],
-        'Java': [r'public\s+class', r'import\s+java\.', r'public\s+static\s+void\s+main'],
-        'C++': [r'#include\s*<', r'using\s+namespace', r'std::', r'cout\s*<<'],
-        'C': [r'#include\s*<stdio\.h>', r'int\s+main\s*\(', r'printf\s*\('],
-        'Go': [r'package\s+\w+', r'func\s+\w+', r'import\s*\(', r'go\s+\w+'],
-        'Rust': [r'fn\s+\w+', r'let\s+mut', r'use\s+\w+', r'impl\s+\w+'],
-        'Ruby': [r'def\s+\w+', r'class\s+\w+', r'require\s+', r'puts\s+'],
-        'PHP': [r'<\?php', r'function\s+\w+', r'\$\w+', r'echo\s+'],
-        'C#': [r'using\s+System', r'namespace\s+\w+', r'public\s+class', r'Console\.'],
-        'Shell': [r'#!/bin/bash', r'#!/bin/sh', r'echo\s+', r'if\s*\[\s*'],
-        'SQL': [r'SELECT\s+', r'FROM\s+', r'WHERE\s+', r'INSERT\s+INTO'],
-        'HTML': [r'<html>', r'<div>', r'<script>', r'<!DOCTYPE'],
-        'CSS': [r'\{\s*\w+:', r'@media', r'\.[\w-]+\s*\{', r'#[\w-]+\s*\{'],
-        'YAML': [r'^\s*\w+:\s*', r'^\s*-\s+\w+'],
-        'JSON': [r'^\s*\{', r'"\w+":\s*', r'^\s*\[']
+    # Check file extension first for definitive matches
+    ext = os.path.splitext(filename)[1].lower()
+    ext_map = {
+        '.py': 'Python', '.js': 'JavaScript', '.ts': 'TypeScript',
+        '.java': 'Java', '.c': 'C', '.cpp': 'C++', '.go': 'Go',
+        '.rs': 'Rust', '.rb': 'Ruby', '.php': 'PHP', '.cs': 'C#',
+        '.sh': 'Shell', '.sql': 'SQL', '.html': 'HTML', '.css': 'CSS',
+        '.yml': 'YAML', '.yaml': 'YAML', '.json': 'JSON'
     }
     
-    detected = []
+    # If we have a clear extension match, use it
+    if ext in ext_map:
+        return [ext_map[ext]]
+    
+    # Only use content patterns for files without clear extensions
+    patterns = {
+        'Python': [r'import\s+\w+', r'def\s+\w+\s*\(', r'if\s+__name__\s*==\s*["\']__main__["\']'],
+        'JavaScript': [r'function\s+\w+\s*\(', r'var\s+\w+\s*=', r'console\.log'],
+        'TypeScript': [r'interface\s+\w+', r'type\s+\w+\s*=', r'export\s+interface'],
+        'Java': [r'public\s+class\s+\w+', r'import\s+java\.'],
+        'Shell': [r'#!/bin/bash', r'#!/bin/sh']
+    }
+    
+    # Return only the first match to avoid multiple detections
     for lang, lang_patterns in patterns.items():
         for pattern in lang_patterns:
-            if re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
-                detected.append(lang)
-                break
+            if re.search(pattern, content, re.MULTILINE):
+                return [lang]
     
-    return detected
+    return []
 
 def detect_language_from_shebang(content):
     """Detect language from shebang line."""
@@ -58,6 +59,7 @@ def auto_detect_languages(folder_path):
                 continue
                 
             full_path = os.path.join(root, file)
+            detected_lang = None
             
             try:
                 with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -66,23 +68,16 @@ def auto_detect_languages(folder_path):
                 # Check shebang first
                 shebang_lang = detect_language_from_shebang(content)
                 if shebang_lang:
-                    languages[shebang_lang] += 1
-                    continue
+                    detected_lang = shebang_lang
+                else:
+                    # Detect from content patterns (returns max 1 language now)
+                    detected_langs = detect_language_from_content(content, file)
+                    if detected_langs:
+                        detected_lang = detected_langs[0]  # Take only the first match
                 
-                # Detect from content patterns
-                detected_langs = detect_language_from_content(content, file)
-                for lang in detected_langs:
-                    languages[lang] += 1
-                
-                # Fallback: simple extension mapping for common cases
-                ext = os.path.splitext(file)[1].lower()
-                ext_map = {
-                    '.py': 'Python', '.js': 'JavaScript', '.ts': 'TypeScript',
-                    '.java': 'Java', '.c': 'C', '.cpp': 'C++', '.go': 'Go',
-                    '.rs': 'Rust', '.rb': 'Ruby', '.php': 'PHP', '.cs': 'C#'
-                }
-                if ext in ext_map and not detected_langs:
-                    languages[ext_map[ext]] += 1
+                # Count only one language per file
+                if detected_lang:
+                    languages[detected_lang] += 1
                     
             except:
                 continue
