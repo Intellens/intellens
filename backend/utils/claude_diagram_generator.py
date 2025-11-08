@@ -1,13 +1,10 @@
-import anthropic
+import boto3
 import json
 import os
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-
-# Configure Claude API
-CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY')
 
 def generate_architecture_diagram(languages, services, connections, file_structure):
     """Generate professional architecture diagram using Claude AI."""
@@ -55,25 +52,22 @@ def generate_architecture_diagram(languages, services, connections, file_structu
     """
     
     try:
-        if not CLAUDE_API_KEY:
-            return create_fallback_diagram(languages, services)
-            
-        client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
+        bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
         
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
-            max_tokens=2000,
-            messages=[
-                {"role": "user", "content": context}
-            ]
+        response = bedrock.invoke_model(
+            modelId='anthropic.claude-3-sonnet-20240229-v1:0',
+            body=json.dumps({
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 2000,
+                "messages": [{"role": "user", "content": context}]
+            })
         )
         
-        # Parse JSON response
-        diagram_data = json.loads(response.content[0].text)
+        result = json.loads(response['body'].read())
+        diagram_data = json.loads(result['content'][0]['text'])
         return diagram_data
         
     except Exception as e:
-        # Fallback diagram if API fails
         return create_fallback_diagram(languages, services)
 
 def create_fallback_diagram(languages, services):

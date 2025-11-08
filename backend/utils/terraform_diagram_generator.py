@@ -21,33 +21,44 @@ def generate_terraform_diagram(languages, services, project_name="Project"):
 def _create_tech_architecture_diagram(detected_services, project_name):
     """Create tech architecture diagram based on actual project analysis."""
     
-    # AWS service mapping based on detected patterns
+    # AWS service mapping with cost estimates
     service_mapping = {
-        'auth': {'id': 'auth', 'name': 'Authentication', 'icon': '🔐', 'color': '#FF6B6B'},
-        'api': {'id': 'api', 'name': 'API Server', 'icon': '🔄', 'color': '#FF6B9D'},
-        'serverless': {'id': 'serverless', 'name': 'Serverless Functions', 'icon': '🔶', 'color': '#FF9500'},
-        'nosql_database': {'id': 'nosql_db', 'name': 'NoSQL Database', 'icon': '⚡', 'color': '#4ECDC4'},
-        'sql_database': {'id': 'sql_db', 'name': 'SQL Database', 'icon': '🗄️', 'color': '#4ECDC4'},
-        'storage': {'id': 'storage', 'name': 'File Storage', 'icon': '🪣', 'color': '#52C41A'},
-        'cdn': {'id': 'cdn', 'name': 'Content Delivery', 'icon': '🌐', 'color': '#722ED1'},
-        'container': {'id': 'container', 'name': 'Container Service', 'icon': '📦', 'color': '#FF7A45'},
-        'compute': {'id': 'compute', 'name': 'Compute Service', 'icon': '💻', 'color': '#FF9500'}
+        'auth': {'id': 'auth', 'name': 'Authentication', 'icon': '🔐', 'color': '#FF6B6B', 'monthly_cost': '$5-15'},
+        'api': {'id': 'api', 'name': 'API Server', 'icon': '🔄', 'color': '#FF6B9D', 'monthly_cost': '$10-50'},
+        'serverless': {'id': 'serverless', 'name': 'Serverless Functions', 'icon': '🔶', 'color': '#FF9500', 'monthly_cost': '$2-20'},
+        'nosql_database': {'id': 'nosql_db', 'name': 'NoSQL Database', 'icon': '⚡', 'color': '#4ECDC4', 'monthly_cost': '$5-25'},
+        'sql_database': {'id': 'sql_db', 'name': 'SQL Database', 'icon': '🗄️', 'color': '#4ECDC4', 'monthly_cost': '$15-100'},
+        'storage': {'id': 'storage', 'name': 'File Storage', 'icon': '🪣', 'color': '#52C41A', 'monthly_cost': '$1-10'},
+        'cdn': {'id': 'cdn', 'name': 'Content Delivery', 'icon': '🌐', 'color': '#722ED1', 'monthly_cost': '$5-30'},
+        'container': {'id': 'container', 'name': 'Container Service', 'icon': '📦', 'color': '#FF7A45', 'monthly_cost': '$20-200'},
+        'compute': {'id': 'compute', 'name': 'Compute Service', 'icon': '💻', 'color': '#FF9500', 'monthly_cost': '$10-100'}
     }
     
     # Build services based on what was actually detected
     services = []
     step_counter = 1
     workflow_steps = []
+    total_cost_min = 0
+    total_cost_max = 0
     
     for service_type, is_detected in detected_services.items():
         if is_detected and service_type in service_mapping:
             service_config = service_mapping[service_type]
+            
+            # Extract cost range
+            cost_range = service_config['monthly_cost'].replace('$', '').split('-')
+            min_cost = int(cost_range[0])
+            max_cost = int(cost_range[1])
+            total_cost_min += min_cost
+            total_cost_max += max_cost
+            
             services.append({
                 'id': service_config['id'],
                 'name': service_config['name'],
                 'icon': service_config['icon'],
                 'color': service_config['color'],
                 'category': service_type,
+                'monthly_cost': service_config['monthly_cost'],
                 'inputs': [{'id': f"{service_config['id']}_input", 'label': 'Input'}],
                 'outputs': [{'id': f"{service_config['id']}_output", 'label': 'Output'}]
             })
@@ -72,12 +83,22 @@ def _create_tech_architecture_diagram(detected_services, project_name):
             'outputs': [{'id': 'cloudformation_output', 'label': 'Output'}]
         })
     
+    # Generate intelligent connections using Bedrock
+    connections = generate_service_connections(services, detected_services)
+    
     return {
         'title': f'{project_name} Architecture',
         'style': 'tech_diagram',
         'project_name': project_name,
         'services': services,
-        'workflow_steps': workflow_steps
+        'connections': connections,
+        'workflow_steps': workflow_steps,
+        'cost_estimate': {
+            'monthly_min': total_cost_min,
+            'monthly_max': total_cost_max,
+            'range': f'${total_cost_min}-{total_cost_max}/month',
+            'note': 'Estimated costs for development/low-traffic usage'
+        }
     }
 
 
@@ -223,6 +244,91 @@ def _generate_terraform_config(services, project_name):
             }
     
     return terraform_config
+
+def generate_service_connections(services, detected_services):
+    """Use Bedrock to generate intelligent service connections."""
+    try:
+        import boto3
+        import json
+        
+        bedrock = boto3.client('bedrock-runtime', region_name='us-east-1')
+        
+        service_list = [f"{s['name']} ({s['id']})" for s in services]
+        
+        prompt = f"""
+Analyze these AWS services and create logical connections showing data flow:
+
+Services: {', '.join(service_list)}
+
+Generate connections as JSON array with this format:
+[
+  {{
+    "from": "service_id",
+    "to": "service_id", 
+    "type": "data_flow|api_call|storage|auth",
+    "label": "brief description",
+    "style": "solid|dashed|dotted"
+  }}
+]
+
+Rules:
+- CDN connects to API/Storage
+- API connects to Database/Functions
+- Auth connects to API/Database
+- Functions connect to Database/Storage
+- Use logical flow patterns
+"""
+        
+        response = bedrock.invoke_model(
+            modelId='anthropic.claude-3-sonnet-20240229-v1:0',
+            body=json.dumps({
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 1000,
+                "messages": [{"role": "user", "content": prompt}]
+            })
+        )
+        
+        result = json.loads(response['body'].read())
+        response_text = result['content'][0]['text']
+        
+        # Extract JSON from response
+        import re
+        json_match = re.search(r'\[.*\]', response_text, re.DOTALL)
+        if json_match:
+            connections = json.loads(json_match.group())
+            return connections
+        
+    except Exception as e:
+        print(f"Bedrock connection error: {e}")
+    
+    # Fallback: create basic connections
+    return generate_fallback_connections(services)
+
+def generate_fallback_connections(services):
+    """Generate basic service connections as fallback."""
+    connections = []
+    service_ids = [s['id'] for s in services]
+    
+    # Basic connection patterns
+    patterns = [
+        ('cdn', 'api', 'data_flow', 'Routes requests'),
+        ('api', 'serverless', 'api_call', 'Invokes functions'),
+        ('serverless', 'nosql_db', 'data_flow', 'Stores data'),
+        ('auth', 'api', 'auth', 'Authenticates'),
+        ('storage', 'cdn', 'data_flow', 'Serves content')
+    ]
+    
+    for from_id, to_id, conn_type, label in patterns:
+        if from_id in service_ids and to_id in service_ids:
+            connections.append({
+                'from': from_id,
+                'to': to_id,
+                'type': conn_type,
+                'label': label,
+                'style': 'dashed'
+            })
+    
+    return connections
 
 def generate_terraform_hcl(terraform_config):
     """Convert Terraform config to HCL format with proper formatting."""
