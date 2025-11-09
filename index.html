@@ -1063,7 +1063,21 @@
   <section id="frontend" class="section">
     <div class="close" data-close>✖</div>
     <h2>Frontend Preview</h2>
-    <div id="frontend-preview"></div>
+    <div id="frontend-preview">
+      <div style="text-align:center;padding:40px;color:#666">
+        <div style="display:inline-block;padding:20px;border:2px dashed #ccc;border-radius:12px;margin-bottom:20px">
+          <div style="font-size:48px;margin-bottom:10px">🖥️</div>
+          <div style="font-size:18px;font-weight:600;margin-bottom:8px">Frontend Architecture</div>
+          <div style="display:flex;gap:10px;justify-content:center;margin:15px 0">
+            <div style="padding:8px 12px;background:#f0f8ff;border:1px solid #ddd;border-radius:6px;font-size:12px">HTML</div>
+            <div style="padding:8px 12px;background:#f0fff0;border:1px solid #ddd;border-radius:6px;font-size:12px">CSS</div>
+            <div style="padding:8px 12px;background:#fff8f0;border:1px solid #ddd;border-radius:6px;font-size:12px">JS</div>
+          </div>
+        </div>
+        <h3>No Frontend Detected</h3>
+        <p>This appears to be a backend/CLI project without a web frontend.</p>
+      </div>
+    </div>
   </section>
 
   <section id="readme" class="section">
@@ -1477,8 +1491,25 @@ dropzone.addEventListener("drop", (e) => {
           data.comprehensive_diagram.edges.map(e=>`<div class="item">${e.source} → ${e.target}</div>`).join('');
       }
 
-      document.getElementById('frontend-preview').innerHTML =
-        data.frontend_preview || '<div style="text-align:center;padding:40px;color:#666"><h3>No Frontend Detected</h3><p>This looks like a backend/CLI project.</p></div>';
+      const frontendPreview = document.getElementById('frontend-preview');
+      if (data.frontend_preview) {
+        frontendPreview.innerHTML = data.frontend_preview;
+      } else {
+        frontendPreview.innerHTML = `
+          <div style="text-align:center;padding:40px;color:#666">
+            <div style="display:inline-block;padding:20px;border:2px dashed #ccc;border-radius:12px;margin-bottom:20px">
+              <div style="font-size:48px;margin-bottom:10px">🖥️</div>
+              <div style="font-size:18px;font-weight:600;margin-bottom:8px">Frontend Architecture</div>
+              <div style="display:flex;gap:10px;justify-content:center;margin:15px 0">
+                <div style="padding:8px 12px;background:#f0f8ff;border:1px solid #ddd;border-radius:6px;font-size:12px">HTML</div>
+                <div style="padding:8px 12px;background:#f0fff0;border:1px solid #ddd;border-radius:6px;font-size:12px">CSS</div>
+                <div style="padding:8px 12px;background:#fff8f0;border:1px solid #ddd;border-radius:6px;font-size:12px">JS</div>
+              </div>
+            </div>
+            <h3>No Frontend Detected</h3>
+            <p>This appears to be a backend/CLI project without a web frontend.</p>
+          </div>`;
+      }
 
       document.getElementById('readme-content').textContent = data.readme_content || 'No README content generated';
       window.currentReadmeFilename = data.readme_filename;
