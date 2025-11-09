@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <title>🧱 Intellens Project Analyzer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <base href="./">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
@@ -828,57 +827,28 @@
     transform: scale(1.03);
   }
   /* 🧱 Custom “Start Building” LEGO-style button */
-  .custom-brick {
-    width: 260px;
-    height: 140px;
-    margin: 20px auto 30px auto;  /* Changed this line */
-    cursor: pointer;
-    background: none;
-    border: none;
-    display: grid;
-    place-items: center;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    position: relative;
-  }
-
-.custom-brick .brick-top {
-  position: absolute;
-  top: -26px;
-  left: 0;
-  width: 100%;
-  height: 26px;
-  background: #3f8f43;
-  border-radius: 10px 10px 0 0;
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.custom-brick .brick-body {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(180deg, #5aa95d 0%, #3f8f43 100%);
-  border-radius: 8px;
-  box-shadow: 0 6px 0 #2f7d32, 0 10px 20px rgba(0, 0, 0, 0.15);
-  display: grid;
-  place-items: center;
-}
-
-.brick-text {
-  font-size: 22px;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2px 0 #275b29;
-  user-select: none;
+/* LEGO-style Start Brick Button */
+.custom-brick {
+  width: 1000px;
+  height: 640px;
+  background: url("images/startbrick-removebg-preview.png") center/contain no-repeat;
+  border: none;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .custom-brick:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 0 #2f7d32, 0 16px 24px rgba(0, 0, 0, 0.25);
+  filter: brightness(1.1);
 }
 
 .custom-brick:active {
   transform: translateY(2px);
-  box-shadow: 0 4px 0 #275b29, 0 10px 16px rgba(0, 0, 0, 0.15);
+  filter: brightness(0.95);
 }
+
   </style>
 </head>
 <body>
@@ -893,17 +863,10 @@
   </div>
   <section id="start-screen" class="active">
     <div class="start-wrap">
-      <div id="dropzone" class="dropzone custom-brick">
-        <div class="brick-top">
-          <div class="brick-stud"></div>
-          <div class="brick-stud"></div>
-          <div class="brick-stud"></div>
-        </div>
-        <div class="brick-body">
-          <span class="brick-text">Start Building...</span>
-        </div>
+      <div id="dropzone" class="custom-brick">
         <input type="file" id="fileInput" accept=".zip" hidden />
       </div>
+
     </div>
   </section>
 
@@ -1199,13 +1162,13 @@
 
   <script>
     const BUILD_FRAMES = [
-    "images/9-removebg-preview.png",
-    "images/8-removebg-preview.png",
-    "images/7-removebg-preview.png",
-    "images/6-removebg-preview.png",
-    "images/5-removebg-preview.png",
-    "images/4-removebg-preview.png"
-  ];
+      "images/9-removebg-preview.png",
+      "images/8-removebg-preview.png",
+      "images/7-removebg-preview.png",
+      "images/6-removebg-preview.png",
+      "images/5-removebg-preview.png",
+      "images/4-removebg-preview.png"
+    ];
     const FINAL_TURTLE = "images/Final_Turtle.png";
     (() => { const _img = new Image(); _img.src = FINAL_TURTLE; })(); 
 
