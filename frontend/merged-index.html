@@ -335,6 +335,20 @@
       .dash-layout{grid-template-columns:1fr}
       .section{inset:14px}
     }
+    /* ========== SERVICE POPUP ========== */
+    .service-popup-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(2px);display:none;z-index:25}
+    .service-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(600px,90vw);max-height:70vh;background:#fff;border-radius:16px;box-shadow:0 20px 40px rgba(0,0,0,.2);display:none;z-index:26;overflow:hidden}
+    .service-popup-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--green-500);color:#fff}
+    .service-popup-header h3{margin:0;font-size:18px}
+    .service-popup-close{cursor:pointer;font-size:20px;opacity:.9}
+    .service-popup-close:hover{opacity:1}
+    .service-popup-body{padding:16px 20px;max-height:50vh;overflow-y:auto}
+    .reference-item{margin-bottom:12px;padding:12px;background:#f8f9fa;border-radius:8px;border-left:4px solid var(--green-500)}
+    .reference-file{font-weight:700;color:var(--green-500);margin-bottom:4px;font-size:14px}
+    .reference-line{font-size:12px;color:#666;margin-bottom:6px}
+    .reference-code{font-family:monospace;background:#fff;padding:8px;border-radius:4px;border:1px solid #e9ecef;font-size:13px;white-space:pre-wrap;overflow-x:auto}
+    .reference-match{background:#fff3cd;padding:2px 4px;border-radius:3px}
+
     /* ========== INSIGHTS MODAL (new, non-breaking) ========== */
     .insights-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.22);backdrop-filter:blur(2px);display:none;z-index:30}
     .insights-backdrop.show{display:block}
@@ -409,7 +423,7 @@
         <div class="loader-steps">
           <div class="step"><span class="dot-mini"></span> Extracting files</div>
           <div class="step"><span class="dot-mini"></span> Analyzing architecture</div>
-          <div class="step"><span class="dot-mini"></span> Processing Terraform</div>
+          <div class="step"><span class="dot-mini"></span> Processing Infrastructure</div>
           <div class="step"><span class="dot-mini"></span> Generating insights</div>
         </div>
       </div>
@@ -433,9 +447,9 @@
             <div class="lego-title">Architecture</div>
           </button>
 
-          <button class="lego-button menu-block" data-section="terraform" aria-label="Open Terraform">
-            <img class="lego-img" src="images/3-removebg-preview.png" alt="LEGO brick for Terraform">
-            <div class="lego-title">Terraform</div>
+          <button class="lego-button menu-block" data-section="terraform" aria-label="Open Infrastructure">
+            <img class="lego-img" src="images/3-removebg-preview.png" alt="LEGO brick for Infrastructure">
+            <div class="lego-title">Infrastructure</div>
           </button>
 
           <button class="lego-button menu-block" data-section="components" aria-label="Open Components">
@@ -469,10 +483,29 @@
     </div>
   </section>
 
+  <!-- ============== SERVICE REFERENCES POPUP ============= -->
+  <div id="servicePopupBackdrop" class="service-popup-backdrop"></div>
+  <div id="servicePopup" class="service-popup">
+    <div class="service-popup-header">
+      <h3 id="servicePopupTitle">Service References</h3>
+      <span id="servicePopupClose" class="service-popup-close">✖</span>
+    </div>
+    <div class="service-popup-body" id="servicePopupBody">
+      <!-- References will be populated here -->
+    </div>
+  </div>
+
   <!-- ============== OVERLAYS ============== -->
   <section id="project-summary" class="section">
     <div class="close" data-close>✖</div>
     <h2>Project Summary</h2>
+    
+    <!-- Project Overview -->
+    <div id="project-overview" style="margin-bottom: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2F7D32;">
+      <h3 style="margin-top: 0; color: #2F7D32;">📋 Project Overview</h3>
+      <div id="overview-content" style="line-height: 1.6; color: #495057;"></div>
+    </div>
+    
     <div class="grid">
       <div><h3>Languages</h3><div id="languages"></div></div>
       <div><h3>Services & Technologies</h3><div id="services"></div></div>
@@ -491,7 +524,7 @@
 
   <section id="terraform" class="section">
     <div class="close" data-close>✖</div>
-    <h2>Terraform Infrastructure</h2>
+    <h2>Infrastructure</h2>
     <div id="terraform-diagram"></div>
   </section>
 
@@ -624,6 +657,7 @@
   <script src="aws-tech-diagram.js"></script>
   <script src="enhanced-aws-tech-diagram.js"></script>
   <script src="aws-infrastructure-designer.js"></script>
+  <script src="layered-file-renderer.js"></script>
 
   <script>
     const BUILD_FRAMES = [
@@ -797,16 +831,42 @@
     document.querySelectorAll("[data-close]").forEach(x => x.addEventListener("click", closeSections));
 
     function displayResults(data){
+      // Display project overview
+      if (data.project_overview) {
+        const overview = data.project_overview;
+        const overviewHtml = overview.overview_text
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/• (.*?)\n/g, '<li>$1</li>')
+          .replace(/\n\n/g, '</p><p>')
+          .replace(/^(.*)$/gm, '<p>$1</p>')
+          .replace(/<p><\/p>/g, '')
+          .replace(/<p>(<li>.*<\/li>)<\/p>/g, '<ul>$1</ul>');
+        
+        document.getElementById('overview-content').innerHTML = overviewHtml;
+      } else {
+        document.getElementById('overview-content').innerHTML = '<p>No project overview available.</p>';
+      }
+      
       const langs = data.languages || {};
       document.getElementById('languages').innerHTML = Object.entries(langs)
         .map(([lang,count]) => `<div class="item">${lang}: ${count} file(s)</div>`).join('') || '<div class="item">None</div>';
 
-      let allServices = {...(data.services || {})};
-      const awsTypes = data?.aws_infrastructure_diagram?.summary?.service_types || [];
-      awsTypes.forEach(s => { if (!allServices[s]) allServices[s+" (Recommended)"] = 1; });
+      const servicesWithRefs = data.services_with_references || {};
+      const allServices = data.services || {};
+      
       document.getElementById('services').innerHTML = Object.keys(allServices).length
-        ? Object.entries(allServices).map(([s,c])=>`<div class="item">${s}: ${c} ref(s)</div>`).join('')
+        ? Object.entries(allServices).map(([serviceName, count])=>{
+            const hasRefs = servicesWithRefs[serviceName]?.references?.length > 0;
+            
+            if (hasRefs) {
+              return `<div class="item" style="cursor: pointer; color: #2F7D32; text-decoration: underline;" onclick="showServiceReferences('${serviceName.replace(/'/g, "\\'")}')">📍 ${serviceName}: ${count} ref(s)</div>`;
+            } else {
+              return `<div class="item">${serviceName}: ${count} ref(s)</div>`;
+            }
+          }).join('')
         : '<div class="item">No services detected</div>';
+
+      window.servicesReferencesData = servicesWithRefs;
 
       const files = data.file_details || [];
       document.getElementById('file-details').innerHTML = files.map(f => {
@@ -841,7 +901,12 @@
           </div>`;
       }
 
-      if (data.comprehensive_diagram){
+      // Render layered architecture diagram if available
+      if (data.layered_diagram) {
+        const diagramContainer = document.getElementById('diagram');
+        diagramContainer.innerHTML = '';
+        renderLayeredFileArchitecture(diagramContainer, data.layered_diagram);
+      } else if (data.comprehensive_diagram){
         document.getElementById('nodes').innerHTML =
           '<h4 style="margin:6px 0">Components</h4>' +
           data.comprehensive_diagram.nodes.map(n=>`<div class="item">${n.label} (${n.category})</div>`).join('');
@@ -914,6 +979,65 @@
     insightsBackdrop.addEventListener('click', closeInsights);
     insightsClose.addEventListener('click', closeInsights);
     window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeInsights(); });
+
+    // Service References Popup
+    const servicePopupBackdrop = document.getElementById('servicePopupBackdrop');
+    const servicePopup = document.getElementById('servicePopup');
+    const servicePopupClose = document.getElementById('servicePopupClose');
+    const servicePopupTitle = document.getElementById('servicePopupTitle');
+    const servicePopupBody = document.getElementById('servicePopupBody');
+
+    function showServiceReferences(serviceName) {
+      const serviceData = window.servicesReferencesData?.[serviceName];
+      if (!serviceData || !serviceData.references?.length) {
+        alert('No code references found for this service.');
+        return;
+      }
+
+      servicePopupTitle.textContent = `${serviceName} - Code References`;
+      
+      const referencesHtml = serviceData.references.map(ref => {
+        const highlightedCode = ref.code.replace(
+          new RegExp(escapeRegex(ref.match), 'gi'),
+          `<span class="reference-match">${ref.match}</span>`
+        );
+        
+        return `
+          <div class="reference-item">
+            <div class="reference-file">${ref.file}</div>
+            <div class="reference-line">Line ${ref.line}</div>
+            <div class="reference-code">${highlightedCode}</div>
+          </div>
+        `;
+      }).join('');
+      
+      servicePopupBody.innerHTML = referencesHtml;
+      servicePopupBackdrop.style.display = 'block';
+      servicePopup.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeServicePopup() {
+      servicePopupBackdrop.style.display = 'none';
+      servicePopup.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function escapeRegex(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    servicePopupBackdrop.addEventListener('click', closeServicePopup);
+    servicePopupClose.addEventListener('click', closeServicePopup);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeServicePopup();
+        closeInsights();
+      }
+    });
+
+    // Make showServiceReferences globally available
+    window.showServiceReferences = showServiceReferences;
 
     // simple tabs
     tabButtons.forEach((btn, i) => {
