@@ -29,7 +29,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("images/logo-turtle.png");
+  background-image: url("//images/logo-turtle.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -831,7 +831,7 @@
 .custom-brick {
   width: 1000px;
   height: 640px;
-  background: url("images/startbrick-removebg-preview.png") center/contain no-repeat;
+  background: url("//images/startbrick-removebg-preview.png") center/contain no-repeat;
   border: none;
   cursor: pointer;
   display: block;
@@ -925,32 +925,32 @@
         <div class="sidebar-sub">Click a LEGO block to add it to the build.</div>
         <div class="lego-menu">
           <button class="lego-button menu-block" data-section="project-summary" aria-label="Open Summary">
-            <img class="lego-img" src="images/2-removebg-preview.png" alt="LEGO brick for Summary">
+            <img class="lego-img" src="/images/2-removebg-preview.png" alt="LEGO brick for Summary">
             <div class="lego-title">Summary</div>
           </button>
 
           <button class="lego-button menu-block" data-section="system-arch" aria-label="Open Architecture">
-            <img class="lego-img" src="images/1-removebg-preview.png" alt="LEGO brick for Architecture">
+            <img class="lego-img" src="/images/1-removebg-preview.png" alt="LEGO brick for Architecture">
             <div class="lego-title">Architecture</div>
           </button>
 
           <button class="lego-button menu-block" data-section="terraform" aria-label="Open Infrastructure">
-            <img class="lego-img" src="images/3-removebg-preview.png" alt="LEGO brick for Infrastructure">
+            <img class="lego-img" src="/images/3-removebg-preview.png" alt="LEGO brick for Infrastructure">
             <div class="lego-title">Infrastructure</div>
           </button>
 
           <button class="lego-button menu-block" data-section="components" aria-label="Open Components">
-            <img class="lego-img" src="images/1-removebg-preview.png" alt="LEGO brick for Components">
+            <img class="lego-img" src="/images/1-removebg-preview.png" alt="LEGO brick for Components">
             <div class="lego-title">Components</div>
           </button>
 
           <button class="lego-button menu-block" data-section="frontend" aria-label="Open Frontend">
-            <img class="lego-img" src="images/2-removebg-preview.png" alt="LEGO brick for Frontend">
+            <img class="lego-img" src="/images/2-removebg-preview.png" alt="LEGO brick for Frontend">
             <div class="lego-title">Frontend</div>
           </button>
 
           <button class="lego-button menu-block" data-section="readme" aria-label="Open README">
-            <img class="lego-img" src="images/3-removebg-preview.png" alt="LEGO brick for README">
+            <img class="lego-img" src="/images/3-removebg-preview.png" alt="LEGO brick for README">
             <div class="lego-title">README</div>
           </button>
         </div>
@@ -1162,17 +1162,17 @@
 
   <script>
     const BUILD_FRAMES = [
-      "images/9-removebg-preview.png",
-      "images/8-removebg-preview.png",
-      "images/7-removebg-preview.png",
-      "images/6-removebg-preview.png",
-      "images/5-removebg-preview.png",
-      "images/4-removebg-preview.png"
+      "/images/9-removebg-preview.png",
+      "/images/8-removebg-preview.png",
+      "/images/7-removebg-preview.png",
+      "/images/6-removebg-preview.png",
+      "/images/5-removebg-preview.png",
+      "/images/4-removebg-preview.png"
     ];
-    const FINAL_TURTLE = "images/Final_Turtle.png";
+    const FINAL_TURTLE = "/images/Final_Turtle.png";
     (() => { const _img = new Image(); _img.src = FINAL_TURTLE; })(); 
 
-    const BACKGROUND_LOGO = "images/logo-turtle.png";
+    const BACKGROUND_LOGO = "/images/logo-turtle.png";
     (() => { const preload = new Image(); preload.src = BACKGROUND_LOGO; })();
 
     let analysisData = {};
@@ -1318,7 +1318,7 @@ dropzone.addEventListener("drop", (e) => {
         buildImg.classList.remove("show");
     
         const isFinal = (clickedSet.size === orderedSections.length);
-        const nextSrc = isFinal ? "images/Final_Turtle.png" : BUILD_FRAMES[stageIndex];
+        const nextSrc = isFinal ? "/images/Final_Turtle.png" : BUILD_FRAMES[stageIndex];
     
         buildImg.onerror = () => {
           console.error("Image failed to load:", nextSrc);
