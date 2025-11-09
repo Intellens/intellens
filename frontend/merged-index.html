@@ -22,18 +22,21 @@
     *{box-sizing:border-box}
     html,body{height:100%}
 
-    #bg-logo {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background:
-        linear-gradient(to top, #e6f7ed 0%, #f9fffb 50%, #ffffff 100%),
-        url("images/logo.png") center center / cover no-repeat;
-      z-index: -1;
-      opacity: 1;
-    }    
+/* 🧱🐢 Dynamic Intellens Background */
+#bg-logo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("images/logo-turtle.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  z-index: -1;
+  opacity: 1;
+}
+  
     body {
       margin: 0;
       font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -69,18 +72,94 @@
 
     /* ========== START SCREEN ========== */
     .start-wrap{display:grid;place-items:center;min-height:100vh}
-    .start-card {
-      position: relative;
-      backdrop-filter: blur(14px);
-      border: 2px solid rgba(255,255,255,0.4);
-      box-shadow: 0 10px 40px rgba(47, 125, 50, 0.25);
-      animation: floatCard 6s ease-in-out infinite;
-    }
-    
-    @keyframes floatCard {
-      0%,100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
+/* 🧱 Start Card Layout (Reworked for Centering) */
+.start-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 50px 36px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 40px rgba(47, 125, 50, 0.25);
+  backdrop-filter: blur(14px);
+  animation: floatCard 6s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Centered header */
+.start-title {
+  font-size: clamp(28px, 5vw, 44px);
+  text-align: center;
+  font-weight: 800;
+  margin: 12px 0 6px;
+}
+
+.start-sub {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+/* Soft glowing drop zone */
+.dropzone {
+  background: rgba(255,255,255,0.6);
+  border: 2px dashed rgba(47,125,50,0.4);
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.4);
+  border-radius: 16px;
+  padding: 30px;
+}
+.dropzone:hover {
+  border-color: #E6C229;
+  box-shadow: 0 0 20px rgba(230,194,41,0.4),
+              inset 0 0 12px rgba(255,255,255,0.5);
+}
+
+/* Centered "Start Building" button */
+.start-actions {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0 10px;
+}
+
+.btn.start {
+  background: linear-gradient(180deg, #4CAF50, #2F7D32);
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  padding: 16px 36px;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(47, 125, 50, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn.start:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.btn.start:active {
+  transform: translateY(3px);
+  box-shadow: 0 4px 10px rgba(47,125,50,0.25);
+}
+
+/* Learn link */
+.learn {
+  display: block;
+  text-align: center;
+  margin: 6px 0 22px;
+  color: var(--green-500);
+  font-weight: 700;
+  text-decoration: none;
+}
     
     /* soft glowing border around upload zone */
     .dropzone {
@@ -104,16 +183,6 @@
     .start-sub{ text-align:center; color:var(--muted); margin-bottom:18px }
 
     /* Drag & Drop */
-    .dropzone{
-      margin:14px 18px 20px;border:2px dashed var(--ring);border-radius:16px;
-      padding:30px;display:grid;place-items:center;gap:8px;
-      transition:border-color .15s ease, background .15s ease;
-      background:#f4faf4;
-    }
-    .dropzone.dragover{background:#eef8ee;border-color:var(--green-300)}
-    .drop-icon{font-size:34px;opacity:.8}
-    .drop-title{font-weight:700}
-    .drop-sub{font-size:13px;color:var(--muted)}
 
     .start-actions{display:flex;gap:12px;justify-content:center;margin:6px 0 8px}
     .learn{display:block;text-align:center;margin:6px 0 22px;color:var(--green-500);font-weight:700;text-decoration:none}
@@ -150,7 +219,6 @@
 }
 
 /* === CUTE TURTLE SCENE === */
-/* === CUTE TURTLE SCENE (Day → Night Transition) === */
 .scene {
   position: relative;
   overflow: hidden;
@@ -758,8 +826,63 @@
     filter: brightness(1.1);
     transform: scale(1.03);
   }
+  /* 🧱 Custom “Start Building” LEGO-style button */
+  .custom-brick {
+    width: 260px;
+    height: 140px;
+    margin: 20px auto 30px auto;  /* Changed this line */
+    cursor: pointer;
+    background: none;
+    border: none;
+    display: grid;
+    place-items: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+  }
+
+.custom-brick .brick-top {
+  position: absolute;
+  top: -26px;
+  left: 0;
+  width: 100%;
+  height: 26px;
+  background: #3f8f43;
+  border-radius: 10px 10px 0 0;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.custom-brick .brick-body {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #5aa95d 0%, #3f8f43 100%);
+  border-radius: 8px;
+  box-shadow: 0 6px 0 #2f7d32, 0 10px 20px rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+}
+
+.brick-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 0 #275b29;
+  user-select: none;
+}
+
+.custom-brick:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 0 #2f7d32, 0 16px 24px rgba(0, 0, 0, 0.25);
+}
+
+.custom-brick:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 #275b29, 0 10px 16px rgba(0, 0, 0, 0.15);
+}
   </style>
 </head>
+<body>
+  <div id="bg-logo"></div>
+</body>
   <!-- ============== START ============== -->
   <div class="lego-bubbles">
     <div class="bubble" style="--x:10%;--d:15s;--s:1.1;--c:#2F7D32;"></div>
@@ -769,33 +892,17 @@
   </div>
   <section id="start-screen" class="active">
     <div class="start-wrap">
-      <div class="start-card card">
-        <div class="start-hero">
-          <div class="start-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            </svg>
-          </div>
+      <div id="dropzone" class="dropzone custom-brick">
+        <div class="brick-top">
+          <div class="brick-stud"></div>
+          <div class="brick-stud"></div>
+          <div class="brick-stud"></div>
         </div>
-        <h1 class="start-title">Intellens</h1>
-        <p class="start-sub">Upload your project ZIP file to analyze architecture, Terraform, and more.</p>
-
-        <div id="dropzone" class="dropzone">
-          <div class="drop-icon">⬆️</div>
-          <div class="drop-title">Drag & drop your ZIP file here</div>
-          <div class="drop-sub">or click to browse</div>
-          <input type="file" id="fileInput" accept=".zip" hidden />
+        <div class="brick-body">
+          <span class="brick-text">Start Building...</span>
         </div>
-
-        <div class="start-actions">
-          <button class="btn" id="chooseBtn">Choose File</button>
-        </div>
-        <a class="learn" href="#" onclick="alert('This is a local prototype that sends your ZIP to http://localhost:8000/upload');return false;">Learn more about this project →</a>
+        <input type="file" id="fileInput" accept=".zip" hidden />
       </div>
-      <p class="muted" style="text-align:center;margin-top:12px">Processed locally by your FastAPI at <code>http://localhost:8000</code>.</p>
     </div>
   </section>
 
@@ -1087,18 +1194,8 @@
     const FINAL_TURTLE = "images/Final_Turtle.png";
     (() => { const _img = new Image(); _img.src = FINAL_TURTLE; })(); 
 
-    const BACKGROUND_LOGO = "images/logo.png";
+    const BACKGROUND_LOGO = "images/logo-turtle.png";
     (() => { const preload = new Image(); preload.src = BACKGROUND_LOGO; })();
-
-    document.addEventListener("DOMContentLoaded", () => {
-      Object.assign(document.body.style, {
-        background: `linear-gradient(to top, #e6f7ed 0%, #f9fffb 50%, #ffffff 100%), url('${BACKGROUND_LOGO}') center center / cover no-repeat`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
-        backgroundPosition: "center",
-      });
-    });
 
     let analysisData = {};
     let stageIndex = -1;
@@ -1126,17 +1223,37 @@
       'panel-overview','panel-arch','panel-infra','panel-components','panel-frontend','panel-docs'
     ].map(id => document.getElementById(id));
 
-    chooseBtn.addEventListener("click", () => fileInput.click());
-    dropzone.addEventListener("click", () => fileInput.click());
-    dropzone.addEventListener("dragover", (e)=>{e.preventDefault(); dropzone.classList.add("dragover")});
-    dropzone.addEventListener("dragleave", ()=>dropzone.classList.remove("dragover"));
-    dropzone.addEventListener("drop", (e)=>{
-      e.preventDefault(); dropzone.classList.remove("dragover");
-      const file = e.dataTransfer.files?.[0]; if(file){ handleUpload(file); }
-    });
-    fileInput.addEventListener("change", () => {
-      const f = fileInput.files[0]; if(!f) return; handleUpload(f);
-    });
+// Click on brick to open file picker
+dropzone.addEventListener("click", (e) => {
+  e.stopPropagation();
+  fileInput.click();
+});
+
+// Handle file selection
+fileInput.addEventListener("change", () => {
+  const f = fileInput.files[0]; 
+  if(!f) return; 
+  handleUpload(f);
+});
+
+// Drag and drop on brick
+dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault(); 
+  dropzone.classList.add("dragover");
+});
+
+dropzone.addEventListener("dragleave", () => {
+  dropzone.classList.remove("dragover");
+});
+
+dropzone.addEventListener("drop", (e) => {
+  e.preventDefault(); 
+  dropzone.classList.remove("dragover");
+  const file = e.dataTransfer.files?.[0]; 
+  if(file) { 
+    handleUpload(file); 
+  }
+});
 
         // ===== Loader UX helpers =====
     let loaderInterval = null;
