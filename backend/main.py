@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import os, zipfile, shutil, tempfile
 from utils.parser import parse_terraform_files
 from utils.diagram_builder import build_graph_json
@@ -26,6 +27,10 @@ app.add_middleware(
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Mount static files for frontend
+app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")
+app.mount("/images", StaticFiles(directory="../images"), name="images")
 
 @app.post("/upload")
 async def upload_project(file: UploadFile = File(...)):
@@ -75,7 +80,7 @@ async def upload_project(file: UploadFile = File(...)):
     readme_content = generate_readme(languages, services, file_details, file.filename.split('.')[0])
     
     # Generate frontend preview
-    frontend_preview = generate_frontend_preview(languages, services, file_details)
+    frontend_preview = generate_frontend_preview(languages, services, file_details, extract_dir)
     
     # Generate layered architecture diagram
     layered_diagram = generate_layered_architecture_diagram(languages, services, file.filename.split('.')[0], file_details)
@@ -91,10 +96,6 @@ async def upload_project(file: UploadFile = File(...)):
     
     # Legacy diagram for TF only
     tf_diagram_data = build_graph_json(tf_services, tf_connections)
-
-    # Cleanup
-    os.remove(temp_path)
-    shutil.rmtree(extract_dir)
 
     response_data = {
         "comprehensive_diagram": diagram_data,
@@ -116,6 +117,10 @@ async def upload_project(file: UploadFile = File(...)):
         "project_overview": project_overview
     }
     
+    # Cleanup after building response
+    os.remove(temp_path)
+    shutil.rmtree(extract_dir)
+    
     return JSONResponse(content=response_data, media_type="application/json; charset=utf-8")
 
 @app.get("/download-readme/{filename}")
@@ -129,3 +134,8 @@ async def download_readme(filename: str):
             media_type='text/markdown'
         )
     return JSONResponse({"error": "File not found"}, status_code=404)
+
+@app.get("/")
+async def serve_index():
+    """Serve the main index.html file."""
+    return FileResponse("../index.html")
