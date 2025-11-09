@@ -48,7 +48,7 @@ async def upload_project(file: UploadFile = File(...)):
     diagram_data = build_comprehensive_diagram(languages, services, all_connections)
     
     # Build workflow diagram
-    workflow_data = build_workflow_diagram(languages, services, file.filename.split('.')[0])
+    workflow_data = build_workflow_diagram(languages, services, file.filename.split('.')[0], file_details)
     
     # Generate Mermaid syntax
     mermaid_syntax = generate_mermaid_workflow(languages, services, file.filename.split('.')[0])

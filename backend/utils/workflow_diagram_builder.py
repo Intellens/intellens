@@ -1,4 +1,5 @@
 import json
+from .project_summary_generator import ProjectSummaryGenerator
 
 def get_language_logo(lang):
     """Get logo URL for programming language."""
@@ -103,8 +104,14 @@ def generate_flow_explanations(languages, services):
     
     return explanations
 
-def build_workflow_diagram(languages, services, project_name="Project"):
+def build_workflow_diagram(languages, services, project_name="Project", file_details=None):
     """Build a system architecture diagram with detailed flow explanations."""
+    
+    # Generate AI-powered project summary
+    summary_generator = ProjectSummaryGenerator()
+    project_summary = summary_generator.generate_project_summary(
+        languages, services, project_name, file_details or []
+    )
     
     components = []
     connections = []
@@ -158,7 +165,8 @@ def build_workflow_diagram(languages, services, project_name="Project"):
             "connections": connections,
             "flow_explanations": flow_explanations,
             "diagram_type": "System Architecture / Data Flow Diagram",
-            "purpose": f"Explains how {len(languages)} programming languages interact with {len(services)} services to handle data processing and system operations"
+            "purpose": f"Explains how {len(languages)} programming languages interact with {len(services)} services to handle data processing and system operations",
+            "project_summary": project_summary
         },
         "metadata": {
             "total_components": len(components),
