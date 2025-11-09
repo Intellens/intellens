@@ -1268,7 +1268,7 @@ dropzone.addEventListener("drop", (e) => {
       formData.append("file", file);
     
       try{
-        const res = await fetch("http://localhost:8000/upload", { method: "POST", body: formData });
+        const res = await fetch("https://unauthorized-unarduously-bentlee.ngrok-free.dev/upload", { method: "POST", body: formData });
         const data = await res.json();
         analysisData = data;
       }catch(e){
@@ -1486,7 +1486,7 @@ dropzone.addEventListener("drop", (e) => {
     function downloadReadme(){
       if (!window.currentReadmeFilename) return;
       const a = document.createElement('a');
-      a.href = `http://localhost:8000/download-readme/${window.currentReadmeFilename}`;
+      a.href = `https://unauthorized-unarduously-bentlee.ngrok-free.dev/download-readme/${window.currentReadmeFilename}`;
       a.download = 'README.md';
       a.click();
     }
